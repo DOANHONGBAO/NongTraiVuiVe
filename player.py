@@ -37,7 +37,7 @@ class Player:
             Card("Lũy thừa điểm x2", 0),       # Lũy thừa điểm x2
             Card("Lũy thừa điểm x3", 0),       # Lũy thừa điểm x3
         ]
-        return random.sample(cards, 3)  # Lấy ngẫu nhiên 3 lá bài từ bộ
+        return random.sample(cards, 5)  # Lấy ngẫu nhiên 3 lá bài từ bộ
 
     def apply_card_effect(self, card):
         # Áp dụng hiệu ứng của lá bài

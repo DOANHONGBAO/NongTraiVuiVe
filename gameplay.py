@@ -5,32 +5,43 @@ from merchant import Merchant
 from animal import Animal
 from calculateScore import calculate_score, save_score
 
+
 def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
-    round_count = 0
     player = Player()
-    selected_card = [False, False, False]
+    selected_card = [False, False, False, False, False]
     clock = pygame.time.Clock()
 
-    # Merchant and UI states
     merchant = Merchant()
-    show_merchant = False
+    show_merchant = True
     show_items = False
     buy_merchant = True
 
-    # Score summary state
     show_score_summary = False
     score_saved = False
 
-    # Tăng kích thước các thành phần giao diện theo độ phân giải lớn hơn
+    current_day = 1
+    rolls_left = 1
+
     CARD_WIDTH, CARD_HEIGHT = 300, 150
     ITEM_WIDTH, ITEM_HEIGHT = 300, 150
     BUTTON_WIDTH, BUTTON_HEIGHT = 300, 90
 
+    merchant_buttons = []
+
+    def draw_cards():
+        player.hand = player.draw_cards()
+        for i in range(len(selected_card)):
+            selected_card[i] = False
+
+    draw_cards()
+
     while True:
         SCREEN.fill(COLORS["GREEN"])
-        round_count += 1
 
-        if (round_count % 50 == 0) and buy_merchant:
+        merchant_buttons.clear()
+
+        # Thương gia mỗi 2 ngày
+        if (current_day % 2 == 0) and buy_merchant:
             merchant = Merchant()
             show_merchant = True
             buy_merchant = False
@@ -38,27 +49,44 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
         # ===== VẼ GIAO DIỆN =====
 
         gold_text = BIG_FONT.render(f"Vàng: {player.gold}", True, COLORS["YELLOW"])
-        gold_rect = gold_text.get_rect(topleft=(30, 30))
-        SCREEN.blit(gold_text, gold_rect)
+        SCREEN.blit(gold_text, (30, 30))
 
         farm_text = BIG_FONT.render(
-            f"Động vật: {len(player.animals)} |  Thức ăn: {len(player.food)}",
+            f"Động vật: {len(player.animals)} | Thức ăn: {len(player.food)}",
             True, COLORS["BLACK"]
         )
-        SCREEN.blit(farm_text, (30, 130))
+        SCREEN.blit(farm_text, (30, 100))
 
-        # Nút quay lại menu
+        day_text = BIG_FONT.render(f"Ngày {current_day}", True, COLORS["BLACK"])
+        SCREEN.blit(day_text, (30, 170))
+
+        roll_text = FONT.render(f"Lượt roll còn lại: {rolls_left}", True, COLORS["BLACK"])
+        SCREEN.blit(roll_text, (30, 220))
+
         back_button = pygame.Rect(WIDTH - BUTTON_WIDTH - 30, 30, BUTTON_WIDTH, BUTTON_HEIGHT)
         pygame.draw.rect(SCREEN, COLORS["BROWN"], back_button)
         back_text = FONT.render("Quay lại Menu", True, COLORS["WHITE"])
-        back_text_rect = back_text.get_rect(center=back_button.center)
-        SCREEN.blit(back_text, back_text_rect)
+        SCREEN.blit(back_text, back_button.move(40, 30))
 
-        merchant_buttons = []
+        next_day_button = pygame.Rect(WIDTH - BUTTON_WIDTH - 30, 150, BUTTON_WIDTH, 60)
+        pygame.draw.rect(SCREEN, COLORS["BLACK"], next_day_button)
+        next_day_text = FONT.render("➡️ Qua ngày", True, COLORS["WHITE"])
+        SCREEN.blit(next_day_text, next_day_button.move(70, 10))
+
+        roll_button = pygame.Rect(WIDTH - BUTTON_WIDTH - 30, 230, BUTTON_WIDTH, 60)
+        pygame.draw.rect(SCREEN, COLORS["DARK_GREEN"], roll_button)
+        roll_text_btn = FONT.render("🎲 Rút lại bài", True, COLORS["WHITE"])
+        SCREEN.blit(roll_text_btn, roll_button.move(70, 10))
+
+        play_button = pygame.Rect(WIDTH - BUTTON_WIDTH - 30, 310, BUTTON_WIDTH, 60)
+        pygame.draw.rect(SCREEN, COLORS["BROWN"], play_button)
+        play_text = FONT.render("▶️ Tính điểm", True, COLORS["WHITE"])
+        SCREEN.blit(play_text, play_button.move(70, 10))
+
         if show_merchant and not show_items:
-            see_items_button = pygame.Rect(50, 200, BUTTON_WIDTH, BUTTON_HEIGHT)
+            see_items_button = pygame.Rect(50, 300, BUTTON_WIDTH, 60)
             pygame.draw.rect(SCREEN, COLORS["BROWN"], see_items_button)
-            see_text = FONT.render("Xem hàng từ thương gia", True, COLORS["WHITE"])
+            see_text = FONT.render("🛒 Xem hàng từ thương gia", True, COLORS["WHITE"])
             see_text_rect = see_text.get_rect(center=see_items_button.center)
             SCREEN.blit(see_text, see_text_rect)
 
@@ -78,22 +106,16 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
 
             back_merchant_button = pygame.Rect(420, 500, BUTTON_WIDTH, 60)
             pygame.draw.rect(SCREEN, COLORS["BLACK"], back_merchant_button)
-            back_text = FONT.render(" Không mua nữa", True, COLORS["WHITE"])
+            back_text = FONT.render("⬅️ Không mua nữa", True, COLORS["WHITE"])
             back_text_rect = back_text.get_rect(center=back_merchant_button.center)
             SCREEN.blit(back_text, back_text_rect)
 
-            for i, card in enumerate(player.hand):
-                card_x = 50 + i * (CARD_WIDTH + 60)
-                card_y = 650
-                card.draw(SCREEN, card_x, card_y, FONT, COLORS["BROWN"], COLORS["WHITE"], COLORS["YELLOW"])
-                if selected_card[i]:
-                    pygame.draw.rect(SCREEN, COLORS["YELLOW"], (card_x, card_y, CARD_WIDTH, CARD_HEIGHT), 4)
-
-            play_button = pygame.Rect(WIDTH - BUTTON_WIDTH - 30, HEIGHT - BUTTON_HEIGHT - 30, BUTTON_WIDTH, BUTTON_HEIGHT)
-            pygame.draw.rect(SCREEN, COLORS["DARK_GREEN"], play_button)
-            play_text = FONT.render("CHƠI BÀI", True, COLORS["WHITE"])
-            play_text_rect = play_text.get_rect(center=play_button.center)
-            SCREEN.blit(play_text, play_text_rect)
+        for i, card in enumerate(player.hand):
+            card_x = 50 + i * (CARD_WIDTH + 60)
+            card_y = 650
+            card.draw(SCREEN, card_x, card_y, FONT, COLORS["BROWN"], COLORS["WHITE"], COLORS["YELLOW"])
+            if selected_card[i]:
+                pygame.draw.rect(SCREEN, COLORS["YELLOW"], (card_x, card_y, CARD_WIDTH, CARD_HEIGHT), 5)
 
         if show_score_summary:
             score = calculate_score(player)
@@ -116,8 +138,6 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
             confirm_text_rect = confirm_text.get_rect(center=confirm_button.center)
             SCREEN.blit(confirm_text, confirm_text_rect)
 
-        # ===== XỬ LÝ SỰ KIỆN =====
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -128,27 +148,32 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
                     if confirm_button.collidepoint(event.pos):
                         return "back_to_menu"
 
-                if back_button.collidepoint(event.pos):
-                    show_score_summary = True
+                # if back_button.collidepoint(event.pos):
+                    # show_score_summary = True
+
+                if play_button.collidepoint(event.pos):
+                    # Tính điểm từ các lá bài và cộng vào vàng của người chơi
+                    for card in player.hand:
+                        player.gold += card.value  # Thêm giá trị của lá bài vào vàng
+                    draw_cards()
+
+                if next_day_button.collidepoint(event.pos):
+                    current_day += 1
+                    rolls_left = 1
+                    draw_cards()
+                    buy_merchant = True
+                    show_merchant = False
+                    show_items = False
+
+                if roll_button.collidepoint(event.pos) and rolls_left > 0:
+                    draw_cards()
+                    rolls_left -= 1
 
                 if show_merchant and not show_items:
                     if see_items_button.collidepoint(event.pos):
                         show_items = True
 
                 elif show_merchant and show_items:
-                    for i in range(3):
-                        card_x = 50 + i * (CARD_WIDTH + 60)
-                        card_rect = pygame.Rect(card_x, 650, CARD_WIDTH, CARD_HEIGHT)
-                        if card_rect.collidepoint(event.pos):
-                            selected_card[i] = not selected_card[i]
-
-                    if play_button.collidepoint(event.pos):
-                        for i in range(3):
-                            if selected_card[i]:
-                                player.gold += player.hand[i].value
-                                selected_card[i] = False
-                        player.hand = player.draw_cards()
-
                     for btn, item in merchant_buttons:
                         if btn.collidepoint(event.pos) and player.gold >= item.cost:
                             player.gold -= item.cost
@@ -156,12 +181,18 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
                                 player.animals.append(item.name)
                             else:
                                 player.food.append(item.name)
-                            buy_merchant = True
-                            show_items = False
-                            show_merchant = False
+                            merchant.items.remove(item)
+                            break
 
                     if back_merchant_button.collidepoint(event.pos):
                         show_items = False
+
+                for i in range(len(player.hand)):
+                    card_x = 50 + i * (CARD_WIDTH + 60)
+                    card_y = 650
+                    card_rect = pygame.Rect(card_x, card_y, CARD_WIDTH, CARD_HEIGHT)
+                    if card_rect.collidepoint(event.pos):
+                        selected_card[i] = not selected_card[i]
 
         pygame.display.update()
         clock.tick(60)
