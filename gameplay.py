@@ -10,7 +10,7 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
     player = Player()
     selected_card = [False, False, False, False, False]
     clock = pygame.time.Clock()
-
+    count_select_one_day = 3
     merchant = Merchant()
     show_merchant = True
     show_items = False
@@ -34,7 +34,6 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
             selected_card[i] = False
 
     draw_cards()
-
     while True:
         SCREEN.fill(COLORS["GREEN"])
 
@@ -148,15 +147,30 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
                     if confirm_button.collidepoint(event.pos):
                         return "back_to_menu"
 
-                # if back_button.collidepoint(event.pos):
-                    # show_score_summary = True
+                if back_button.collidepoint(event.pos):
+                    show_score_summary = True
 
                 if play_button.collidepoint(event.pos):
                     # Tính điểm từ các lá bài và cộng vào vàng của người chơi
-                    for card in player.hand:
-                        player.gold += card.value  # Thêm giá trị của lá bài vào vàng
-                    draw_cards()
-
+                    temp = []
+                    for i,card in enumerate(player.hand):
+                        if selected_card[i]:
+                            player.gold += card.value  # Thêm giá trị của lá bài vào vàng
+                            temp.append(card)
+                            count_select_one_day -= 1
+                            selected_card[i] = False   
+                    for card in temp:
+                        player.hand.remove(card)
+                    # print()
+                    # draw_cards()
+                for i in range(len(player.hand)):
+                    card_x = 50 + i * (CARD_WIDTH + 60)
+                    card_y = 650
+                    card_rect = pygame.Rect(card_x, card_y, CARD_WIDTH, CARD_HEIGHT)
+                    if card_rect.collidepoint(event.pos) and (sum(selected_card) < count_select_one_day) and (selected_card[i] == False):
+                        selected_card[i] = True
+                    elif card_rect.collidepoint(event.pos) and selected_card[i] == True:
+                        selected_card[i] = not selected_card[i]
                 if next_day_button.collidepoint(event.pos):
                     current_day += 1
                     rolls_left = 1
@@ -164,10 +178,12 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
                     buy_merchant = True
                     show_merchant = False
                     show_items = False
+                    count_select_one_day = 3
 
                 if roll_button.collidepoint(event.pos) and rolls_left > 0:
                     draw_cards()
                     rolls_left -= 1
+
 
                 if show_merchant and not show_items:
                     if see_items_button.collidepoint(event.pos):
@@ -186,13 +202,6 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
 
                     if back_merchant_button.collidepoint(event.pos):
                         show_items = False
-
-                for i in range(len(player.hand)):
-                    card_x = 50 + i * (CARD_WIDTH + 60)
-                    card_y = 650
-                    card_rect = pygame.Rect(card_x, card_y, CARD_WIDTH, CARD_HEIGHT)
-                    if card_rect.collidepoint(event.pos):
-                        selected_card[i] = not selected_card[i]
 
         pygame.display.update()
         clock.tick(60)
