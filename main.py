@@ -2,7 +2,7 @@ import pygame
 import sys
 from menu import start_screen
 from gameplay import gameplay_screen
-
+from farming_screen import farming_screen 
 pygame.init()
 WIDTH, HEIGHT = 1915, 1020 
 SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -15,15 +15,20 @@ COLORS = {
     "DARK_GREEN": (60, 130, 60),
     "BLACK": (0, 0, 0),
     "YELLOW": (255, 215, 0),
-    "BROWN": (160, 100, 50)
+    "BROWN": (160, 100, 50),
+    "LIGHT_GREEN": (180, 255, 180)  # Thêm dòng này để tránh lỗi
 }
+
 FONT = pygame.font.Font("assets/fonts/arcade-among-1.otf", 24)
 BIG_FONT = pygame.font.Font("assets/fonts/arcade-among-1.otf", 36)
 
 # Các trạng thái của game
 STATE_MENU = "menu"
 STATE_GAMEPLAY = "gameplay"
+STATE_FARMING = "farming"
 current_state = STATE_MENU
+player = None
+current_day = 1
 
 # Hàm chính
 def main():
@@ -47,8 +52,18 @@ def main():
 
         elif current_state == STATE_GAMEPLAY:
             result = gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS)
-            if result == "back_to_menu":
-                current_state = STATE_MENU  # Quay lại menu khi nhận được "back_to_menu"
+            if isinstance(result, tuple):
+                    action, player, current_day = result
+                    if action == "go_to_farming":
+                        current_state = STATE_FARMING
+                    elif action == "back_to_menu":
+                        current_state = STATE_MENU
+            elif result == "back_to_menu":
+                    current_state = STATE_MENU
+        elif current_state == STATE_FARMING:
+            result = farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, current_day)
+            if result == "back_to_gameplay":
+                current_state = STATE_GAMEPLAY
 
         clock.tick(60)
 

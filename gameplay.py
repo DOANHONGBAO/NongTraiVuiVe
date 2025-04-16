@@ -26,9 +26,11 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
     current_day = 1
     rolls_left = 1
 
-    CARD_WIDTH, CARD_HEIGHT = 300, 150
-    ITEM_WIDTH, ITEM_HEIGHT = 300, 150
+    CARD_WIDTH, CARD_HEIGHT = 300, 450
+    ITEM_WIDTH, ITEM_HEIGHT = 300, 450
     BUTTON_WIDTH, BUTTON_HEIGHT = 300, 90
+    card_bg = pygame.image.load("assets/images/card_frame.png")  
+    card_bg = pygame.transform.scale(card_bg, (CARD_WIDTH, CARD_HEIGHT))
 
     merchant_buttons = []
 
@@ -77,23 +79,30 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
 
         next_day_button = pygame.Rect(WIDTH - BUTTON_WIDTH - 30, 150, BUTTON_WIDTH, 60)
         pygame.draw.rect(SCREEN, COLORS["BLACK"], next_day_button)
-        next_day_text = FONT.render("➡️ Qua ngày", True, COLORS["WHITE"])
+        next_day_text = FONT.render(" Qua ngày", True, COLORS["WHITE"])
         SCREEN.blit(next_day_text, next_day_button.move(70, 10))
 
         roll_button = pygame.Rect(WIDTH - BUTTON_WIDTH - 30, 230, BUTTON_WIDTH, 60)
         pygame.draw.rect(SCREEN, COLORS["DARK_GREEN"], roll_button)
-        roll_text_btn = FONT.render("🎲 Rút lại bài", True, COLORS["WHITE"])
+        roll_text_btn = FONT.render(" Rút lại bài", True, COLORS["WHITE"])
         SCREEN.blit(roll_text_btn, roll_button.move(70, 10))
 
         play_button = pygame.Rect(WIDTH - BUTTON_WIDTH - 30, 310, BUTTON_WIDTH, 60)
         pygame.draw.rect(SCREEN, COLORS["BROWN"], play_button)
-        play_text = FONT.render("▶️ Tính điểm", True, COLORS["WHITE"])
+        play_text = FONT.render(" Tính điểm", True, COLORS["WHITE"])
         SCREEN.blit(play_text, play_button.move(70, 10))
 
         toggle_card_button = pygame.Rect(30, HEIGHT - 80, 200, 50)
         pygame.draw.rect(SCREEN, COLORS["BROWN"], toggle_card_button)
-        toggle_text = FONT.render("🃏 Ẩn/Hiện bài", True, COLORS["WHITE"])
+        toggle_text = FONT.render(" Ẩn/Hiện bài", True, COLORS["WHITE"])
         SCREEN.blit(toggle_text, toggle_card_button.move(40, 10))
+
+        farm_button = pygame.Rect(0, HEIGHT // 2 - 60, 60, 120)
+        pygame.draw.polygon(SCREEN, COLORS["WHITE"], [
+            (farm_button.x + 10, farm_button.y + 60), 
+            (farm_button.x + 50, farm_button.y + 20),
+            (farm_button.x + 50, farm_button.y + 100)
+        ])
 
 
         if show_card_frame:
@@ -109,7 +118,7 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
                 card_x = int(center_x + radius * 0.7 * math.cos(rad)) - CARD_WIDTH // 2
                 card_y = int(center_y + radius * 0.2 * math.sin(rad)) - CARD_HEIGHT // 2
 
-                card.draw(SCREEN, card_x, card_y, FONT, COLORS["BROWN"], COLORS["WHITE"], COLORS["YELLOW"])
+                card.draw(SCREEN, card_x, card_y, FONT, COLORS["BROWN"], COLORS["WHITE"], COLORS["YELLOW"], card_bg)
                 if selected_card[i]:
                     pygame.draw.rect(SCREEN, COLORS["YELLOW"], (card_x, card_y, CARD_WIDTH, CARD_HEIGHT), 5)
 
@@ -139,13 +148,6 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
             back_text = FONT.render("⬅️ Không mua nữa", True, COLORS["WHITE"])
             back_text_rect = back_text.get_rect(center=back_merchant_button.center)
             SCREEN.blit(back_text, back_text_rect)
-
-        # for i, card in enumerate(player.hand):
-        #     card_x = 50 + i * (CARD_WIDTH + 60)
-        #     card_y = 650
-        #     card.draw(SCREEN, card_x, card_y, FONT, COLORS["BROWN"], COLORS["WHITE"], COLORS["YELLOW"])
-        #     if selected_card[i]:
-        #         pygame.draw.rect(SCREEN, COLORS["YELLOW"], (card_x, card_y, CARD_WIDTH, CARD_HEIGHT), 5)
 
         if show_score_summary:
             score = calculate_score(player)
@@ -177,10 +179,11 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if show_score_summary and confirm_button.collidepoint(event.pos):
-                    return "back_to_menu"
+                    return "back_to_menu", None, None
                 if toggle_card_button.collidepoint(event.pos):
                     show_card_frame = not show_card_frame
-
+                if farm_button.collidepoint(event.pos):
+                    return "go_to_farming", player, current_day
                 if show_card_frame:
                     for i in range(len(player.hand)):
                         angle = -90 + (i - len(player.hand) // 2) * 40
@@ -207,16 +210,6 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
                             selected_card[i] = False   
                     for card in temp:
                         player.hand.remove(card)
-                    # print()
-                    # draw_cards()
-                # for i in range(len(player.hand)):
-                #     card_x = 50 + i * (CARD_WIDTH + 60)
-                #     card_y = 650
-                #     card_rect = pygame.Rect(card_x, card_y, CARD_WIDTH, CARD_HEIGHT)
-                #     if card_rect.collidepoint(event.pos) and (sum(selected_card) < count_select_one_day) and (selected_card[i] == False):
-                #         selected_card[i] = True
-                #     elif card_rect.collidepoint(event.pos) and selected_card[i] == True:
-                #         selected_card[i] = not selected_card[i]
                 if next_day_button.collidepoint(event.pos):
                     current_day += 1
                     rolls_left = 1

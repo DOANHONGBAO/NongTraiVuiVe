@@ -11,4 +11,4 @@ class Animal:
         self.hungry = False
 
     def produce_gold(self):
-        return 5 if not self.hungry else 0  # Nếu được cho ăn thì tạo ra vàng
+        return 5 if not self.hungry else 0
