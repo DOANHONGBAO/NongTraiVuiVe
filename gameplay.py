@@ -113,14 +113,39 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
             base_angle = -90
 
             for i, card in enumerate(player.hand):
-                angle = base_angle + (i - len(player.hand) // 2) * angle_step
-                rad = angle * (3.14159 / 180)
-                card_x = int(center_x + radius * 0.7 * math.cos(rad)) - CARD_WIDTH // 2
-                card_y = int(center_y + radius * 0.2 * math.sin(rad)) - CARD_HEIGHT // 2
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                hover_index = None
+                card_positions = []
 
-                card.draw(SCREEN, card_x, card_y, FONT, COLORS["BROWN"], COLORS["WHITE"], COLORS["YELLOW"], card_bg)
-                if selected_card[i]:
-                    pygame.draw.rect(SCREEN, COLORS["YELLOW"], (card_x, card_y, CARD_WIDTH, CARD_HEIGHT), 5)
+                # Tính vị trí của tất cả lá trước
+                for i, card in enumerate(player.hand):
+                    angle = base_angle + (i - len(player.hand) // 2) * angle_step
+                    rad = angle * (math.pi / 180)
+                    card_x = int(center_x + radius * 0.7 * math.cos(rad)) - CARD_WIDTH // 2
+                    card_y = int(center_y + radius * 0.2 * math.sin(rad)) - CARD_HEIGHT // 2
+
+                    card_rect = pygame.Rect(card_x, card_y, CARD_WIDTH, CARD_HEIGHT)
+                    if card_rect.collidepoint(mouse_x, mouse_y):
+                        hover_index = i  # đánh dấu lá đang hover
+
+                    card_positions.append((card_x, card_y))
+
+                # Vẽ tất cả lá ngoại trừ lá đang hover
+                for i, card in enumerate(player.hand):
+                    if i == hover_index:
+                        continue  # bỏ qua, sẽ vẽ sau
+                    card_x, card_y = card_positions[i]
+                    card.draw(SCREEN, card_x, card_y, FONT, COLORS["BROWN"], COLORS["WHITE"], COLORS["YELLOW"], card_bg)
+                    if selected_card[i]:
+                        pygame.draw.rect(SCREEN, COLORS["YELLOW"], (card_x, card_y, CARD_WIDTH, CARD_HEIGHT), 5)
+
+                # Vẽ lá hover sau cùng (nổi lên)
+                if hover_index is not None:
+                    card_x, card_y = card_positions[hover_index]
+                    card_y -= 20  # hiệu ứng dịch lên khi hover
+                    player.hand[hover_index].draw(SCREEN, card_x, card_y, FONT, COLORS["BROWN"], COLORS["WHITE"], COLORS["YELLOW"], card_bg)
+                    if selected_card[hover_index]:
+                        pygame.draw.rect(SCREEN, COLORS["YELLOW"], (card_x, card_y, CARD_WIDTH, CARD_HEIGHT), 5)
 
         if show_merchant and not show_items:
             see_items_button = pygame.Rect(50, 300, BUTTON_WIDTH, 60)
