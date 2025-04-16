@@ -4,6 +4,8 @@ from player import Player
 from merchant import Merchant
 from animal import Animal
 from calculateScore import calculate_score, save_score
+from tiles import TileMap
+import math
 
 
 def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
@@ -18,6 +20,8 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
 
     show_score_summary = False
     score_saved = False
+    show_card_frame = True  # Khung bài đang hiển thị
+
 
     current_day = 1
     rolls_left = 1
@@ -34,8 +38,12 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
             selected_card[i] = False
 
     draw_cards()
+
+    tilemap = TileMap("assets/tiles/background.tmx")  # đường dẫn đến file .tmx
+
     while True:
         SCREEN.fill(COLORS["GREEN"])
+        tilemap.draw(SCREEN)
 
         merchant_buttons.clear()
 
@@ -82,6 +90,29 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
         play_text = FONT.render("▶️ Tính điểm", True, COLORS["WHITE"])
         SCREEN.blit(play_text, play_button.move(70, 10))
 
+        toggle_card_button = pygame.Rect(30, HEIGHT - 80, 200, 50)
+        pygame.draw.rect(SCREEN, COLORS["BROWN"], toggle_card_button)
+        toggle_text = FONT.render("🃏 Ẩn/Hiện bài", True, COLORS["WHITE"])
+        SCREEN.blit(toggle_text, toggle_card_button.move(40, 10))
+
+
+        if show_card_frame:
+            center_x = WIDTH // 2
+            center_y = 780
+            radius = 600
+            angle_step = 40
+            base_angle = -90
+
+            for i, card in enumerate(player.hand):
+                angle = base_angle + (i - len(player.hand) // 2) * angle_step
+                rad = angle * (3.14159 / 180)
+                card_x = int(center_x + radius * 0.7 * math.cos(rad)) - CARD_WIDTH // 2
+                card_y = int(center_y + radius * 0.2 * math.sin(rad)) - CARD_HEIGHT // 2
+
+                card.draw(SCREEN, card_x, card_y, FONT, COLORS["BROWN"], COLORS["WHITE"], COLORS["YELLOW"])
+                if selected_card[i]:
+                    pygame.draw.rect(SCREEN, COLORS["YELLOW"], (card_x, card_y, CARD_WIDTH, CARD_HEIGHT), 5)
+
         if show_merchant and not show_items:
             see_items_button = pygame.Rect(50, 300, BUTTON_WIDTH, 60)
             pygame.draw.rect(SCREEN, COLORS["BROWN"], see_items_button)
@@ -109,12 +140,12 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
             back_text_rect = back_text.get_rect(center=back_merchant_button.center)
             SCREEN.blit(back_text, back_text_rect)
 
-        for i, card in enumerate(player.hand):
-            card_x = 50 + i * (CARD_WIDTH + 60)
-            card_y = 650
-            card.draw(SCREEN, card_x, card_y, FONT, COLORS["BROWN"], COLORS["WHITE"], COLORS["YELLOW"])
-            if selected_card[i]:
-                pygame.draw.rect(SCREEN, COLORS["YELLOW"], (card_x, card_y, CARD_WIDTH, CARD_HEIGHT), 5)
+        # for i, card in enumerate(player.hand):
+        #     card_x = 50 + i * (CARD_WIDTH + 60)
+        #     card_y = 650
+        #     card.draw(SCREEN, card_x, card_y, FONT, COLORS["BROWN"], COLORS["WHITE"], COLORS["YELLOW"])
+        #     if selected_card[i]:
+        #         pygame.draw.rect(SCREEN, COLORS["YELLOW"], (card_x, card_y, CARD_WIDTH, CARD_HEIGHT), 5)
 
         if show_score_summary:
             score = calculate_score(player)
@@ -137,7 +168,9 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
             confirm_text_rect = confirm_text.get_rect(center=confirm_button.center)
             SCREEN.blit(confirm_text, confirm_text_rect)
 
+
         for event in pygame.event.get():
+
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
@@ -146,7 +179,21 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
                 if show_score_summary:
                     if confirm_button.collidepoint(event.pos):
                         return "back_to_menu"
+                if toggle_card_button.collidepoint(event.pos):
+                    show_card_frame = not show_card_frame
 
+                if show_card_frame:
+                    for i in range(len(player.hand)):
+                        angle = -90 + (i - len(player.hand) // 2) * 40
+                        rad = angle * (3.14159 / 180)
+                        card_x = int(WIDTH // 2 + 600 * 0.7 * math.cos(rad)) - CARD_WIDTH // 2
+                        card_y = int(780 + 600 * 0.2 * math.sin(rad)) - CARD_HEIGHT // 2
+                        card_rect = pygame.Rect(card_x, card_y, CARD_WIDTH, CARD_HEIGHT)
+                        if card_rect.collidepoint(event.pos):
+                            if not selected_card[i] and (sum(selected_card) < count_select_one_day):
+                                selected_card[i] = True
+                            elif selected_card[i]:
+                                selected_card[i] = False
                 if back_button.collidepoint(event.pos):
                     show_score_summary = True
 
@@ -163,14 +210,14 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
                         player.hand.remove(card)
                     # print()
                     # draw_cards()
-                for i in range(len(player.hand)):
-                    card_x = 50 + i * (CARD_WIDTH + 60)
-                    card_y = 650
-                    card_rect = pygame.Rect(card_x, card_y, CARD_WIDTH, CARD_HEIGHT)
-                    if card_rect.collidepoint(event.pos) and (sum(selected_card) < count_select_one_day) and (selected_card[i] == False):
-                        selected_card[i] = True
-                    elif card_rect.collidepoint(event.pos) and selected_card[i] == True:
-                        selected_card[i] = not selected_card[i]
+                # for i in range(len(player.hand)):
+                #     card_x = 50 + i * (CARD_WIDTH + 60)
+                #     card_y = 650
+                #     card_rect = pygame.Rect(card_x, card_y, CARD_WIDTH, CARD_HEIGHT)
+                #     if card_rect.collidepoint(event.pos) and (sum(selected_card) < count_select_one_day) and (selected_card[i] == False):
+                #         selected_card[i] = True
+                #     elif card_rect.collidepoint(event.pos) and selected_card[i] == True:
+                #         selected_card[i] = not selected_card[i]
                 if next_day_button.collidepoint(event.pos):
                     current_day += 1
                     rolls_left = 1
