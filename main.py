@@ -3,10 +3,14 @@ import sys
 from menu import start_screen
 from gameplay import gameplay_screen
 from farming_screen import farming_screen 
+from audio import start_background_music, stop_music
+
 pygame.init()
 WIDTH, HEIGHT = 1915, 1020 
 SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption(" Nông Trại Vui Vẻ ")
+
+start_background_music() # Bắt đầu nhạc nền
 
 # Màu sắc và font
 COLORS = {
@@ -40,6 +44,7 @@ def main():
         # Lấy sự kiện toàn cục
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                stop_music()
                 pygame.quit()
                 sys.exit()
 

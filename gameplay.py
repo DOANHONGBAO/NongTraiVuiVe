@@ -6,7 +6,7 @@ from animal import Animal
 from calculateScore import calculate_score, save_score
 from tiles import TileMap
 import math
-
+import random
 
 def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
     player = Player()
@@ -26,11 +26,9 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
     current_day = 1
     rolls_left = 1
 
-    CARD_WIDTH, CARD_HEIGHT = 300, 450
+    CARD_WIDTH, CARD_HEIGHT = 200, 300
     ITEM_WIDTH, ITEM_HEIGHT = 300, 450
     BUTTON_WIDTH, BUTTON_HEIGHT = 300, 90
-    card_bg = pygame.image.load("assets/images/card_frame.png")  
-    card_bg = pygame.transform.scale(card_bg, (CARD_WIDTH, CARD_HEIGHT))
 
     merchant_buttons = []
 
@@ -104,48 +102,52 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
             (farm_button.x + 50, farm_button.y + 100)
         ])
 
+        if "card_y_offsets" not in player.__dict__ or len(player.card_y_offsets) != len(player.hand):
+            player.card_y_offsets = [random.randint(-5, 5) for _ in player.hand]
 
         if show_card_frame:
-            center_x = WIDTH // 2
-            center_y = 780
-            radius = 600
-            angle_step = 40
-            base_angle = -90
+            mouse_pos = pygame.mouse.get_pos()
+            hovered_index = None
+
+            num_cards = len(player.hand)
+            card_spacing = 175
+            total_width = (num_cards - 1) * card_spacing
+            start_x = WIDTH // 2 - total_width // 2
+
+            card_height = player.hand[0].get_image().get_height()
+            base_y = HEIGHT - card_height - 30  # Sát viền dưới, nhưng không chạm hẳn
+
+            hover_offset = -20
+            select_offset = -40
 
             for i, card in enumerate(player.hand):
-                mouse_x, mouse_y = pygame.mouse.get_pos()
-                hover_index = None
-                card_positions = []
+                card_x = start_x + i * card_spacing
+                card_y = base_y + player.card_y_offsets[i]  # lệch nhẹ mỗi lá
 
-                # Tính vị trí của tất cả lá trước
-                for i, card in enumerate(player.hand):
-                    angle = base_angle + (i - len(player.hand) // 2) * angle_step
-                    rad = angle * (math.pi / 180)
-                    card_x = int(center_x + radius * 0.7 * math.cos(rad)) - CARD_WIDTH // 2
-                    card_y = int(center_y + radius * 0.2 * math.sin(rad)) - CARD_HEIGHT // 2
+                card_img = card.get_image()
+                rect = card_img.get_rect(midtop=(card_x, card_y))
+                mask = pygame.mask.from_surface(card_img)
 
-                    card_rect = pygame.Rect(card_x, card_y, CARD_WIDTH, CARD_HEIGHT)
-                    if card_rect.collidepoint(mouse_x, mouse_y):
-                        hover_index = i  # đánh dấu lá đang hover
+                # Kiểm tra hover
+                offset = (mouse_pos[0] - rect.left, mouse_pos[1] - rect.top)
+                if 0 <= offset[0] < rect.width and 0 <= offset[1] < rect.height:
+                    if mask.get_at(offset):
+                        hovered_index = i
 
-                    card_positions.append((card_x, card_y))
+                # Dịch khi chọn hoặc hover
+                if selected_card[i]:
+                    rect.y += select_offset
+                elif hovered_index == i:
+                    rect.y += hover_offset
 
-                # Vẽ tất cả lá ngoại trừ lá đang hover
-                for i, card in enumerate(player.hand):
-                    if i == hover_index:
-                        continue  # bỏ qua, sẽ vẽ sau
-                    card_x, card_y = card_positions[i]
-                    card.draw(SCREEN, card_x, card_y, FONT, COLORS["BROWN"], COLORS["WHITE"], COLORS["YELLOW"], card_bg)
-                    if selected_card[i]:
-                        pygame.draw.rect(SCREEN, COLORS["YELLOW"], (card_x, card_y, CARD_WIDTH, CARD_HEIGHT), 5)
+                SCREEN.blit(card_img, rect.topleft)
 
-                # Vẽ lá hover sau cùng (nổi lên)
-                if hover_index is not None:
-                    card_x, card_y = card_positions[hover_index]
-                    card_y -= 20  # hiệu ứng dịch lên khi hover
-                    player.hand[hover_index].draw(SCREEN, card_x, card_y, FONT, COLORS["BROWN"], COLORS["WHITE"], COLORS["YELLOW"], card_bg)
-                    if selected_card[hover_index]:
-                        pygame.draw.rect(SCREEN, COLORS["YELLOW"], (card_x, card_y, CARD_WIDTH, CARD_HEIGHT), 5)
+                # if selected_card[i]:
+                #     pygame.draw.rect(SCREEN, COLORS["YELLOW"], rect, 4)
+
+
+
+
 
         if show_merchant and not show_items:
             see_items_button = pygame.Rect(50, 300, BUTTON_WIDTH, 60)
@@ -210,17 +212,25 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
                 if farm_button.collidepoint(event.pos):
                     return "go_to_farming", player, current_day
                 if show_card_frame:
-                    for i in range(len(player.hand)):
-                        angle = -90 + (i - len(player.hand) // 2) * 40
-                        rad = angle * (3.14159 / 180)
-                        card_x = int(WIDTH // 2 + 600 * 0.7 * math.cos(rad)) - CARD_WIDTH // 2
-                        card_y = int(780 + 600 * 0.2 * math.sin(rad)) - CARD_HEIGHT // 2
-                        card_rect = pygame.Rect(card_x, card_y, CARD_WIDTH, CARD_HEIGHT)
-                        if card_rect.collidepoint(event.pos):
-                            if not selected_card[i] and (sum(selected_card) < count_select_one_day):
-                                selected_card[i] = True
-                            elif selected_card[i]:
-                                selected_card[i] = False
+                    for i, card in enumerate(player.hand):
+                        card_x = start_x + i * card_spacing
+                        card_y = base_y + player.card_y_offsets[i]
+
+                        card_img = card.get_image()
+                        rect = card_img.get_rect(midtop=(card_x, card_y))
+                        mask = pygame.mask.from_surface(card_img)
+
+                        offset = (event.pos[0] - rect.left, event.pos[1] - rect.top)
+                        if 0 <= offset[0] < rect.width and 0 <= offset[1] < rect.height:
+                            if mask.get_at(offset):
+                                if not selected_card[i] and sum(selected_card) < count_select_one_day:
+                                    selected_card[i] = True
+                                elif selected_card[i]:
+                                    selected_card[i] = False
+                                break
+
+
+
                 if back_button.collidepoint(event.pos):
                     show_score_summary = True
 

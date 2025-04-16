@@ -23,3 +23,14 @@ class Card:
 
         value_text = font.render(f"{self.value}💰", True, text_color)
         surface.blit(value_text, (x + 20, y + 100))
+    def get_image(self):
+        image = pygame.image.load("assets/images/card_frame.png").convert_alpha()
+        image = pygame.transform.scale(image, (200, 300))
+
+        font = pygame.font.SysFont("Arial", 24)
+        text = font.render(self.name, True, (255, 255, 255))
+        value_text = font.render(str(self.value), True, (255, 255, 0))
+
+        image.blit(text, (20, 20))
+        image.blit(value_text, (20, 260))
+        return image
