@@ -1,52 +1,33 @@
-gameplay_screen
-├── player : Player
-│   ├── deck : list[Card]
-│   ├── hand : list[Card]
-│   ├── animals : list[str]  ← sử dụng khi mua Animal
-│   ├── food : list[str]     ← sử dụng khi mua Food
-│   ├── gold : int
-│   └── draw_cards() → hand
-│
-├── merchant : Merchant
-│   └── items : list[Card]
-│
-├── selected_card : list[bool] ← đánh dấu các lá được chọn để chơi
-│
-├── current_day : int
-│   └── ảnh hưởng:
-│       └── Hiển thị thương gia mỗi 2 ngày
-│
-├── count_select_one_day : int = 3
-│   └── Số lượng lá bài có thể dùng trong ngày
-│
-├── rolls_left : int
-│   └── Giới hạn số lần rút lại bài trong ngày
-│
-├── show_merchant : bool
-│   └── Hiển thị hoặc ẩn khung thương gia
-│
-├── show_items : bool
-│   └── Hiển thị chi tiết các món thương gia bán
-│
-├── buy_merchant : bool
-│   └── Tránh load thương gia nhiều lần trong cùng ngày
-│
-├── show_score_summary : bool
-│   └── Kích hoạt hiển thị kết quả cuối
-│
-├── score_saved : bool
-│   └── Ngăn việc lưu điểm nhiều lần
-│
-├── draw_cards()
-│   └── Gọi `player.draw_cards()` và reset `selected_card`
-│
-├── merchant_buttons : list[(button_rect, item)]
-│   └── Dùng để xử lý click vào nút mua hàng
-│
-├── Các button:
-│   ├── back_button → Quay lại menu
-│   ├── play_button → Tính điểm từ các lá bài đã chọn
-│   ├── next_day_button → Qua ngày, reset lượt và load lại bài
-│   ├── roll_button → Rút lại bài nếu còn lượt
-│   ├── see_items_button → Xem hàng từ thương gia
-│   └── back_merchant_button → Thoát khỏi xem hàng
+# 🐮🌾 Nông Trại Vui Vẻ - Game Quản Lý Thẻ Bài và Trang Trại
+
+**Nông Trại Vui Vẻ** là một game kết hợp giữa quản lý trang trại và thẻ bài được phát triển bằng Python và Pygame. Người chơi sẽ xây dựng nông trại, thu thập động vật, tích trữ thức ăn và sử dụng các lá bài sự kiện để kiếm vàng và phát triển trang trại.
+
+---
+
+## 🚀 Tính năng nổi bật
+
+- 🎴 **Thẻ bài sự kiện:** Rút và chọn 3 lá bài mỗi ngày để nhận điểm hoặc hiệu ứng đặc biệt.
+- 🐷 **Động vật & Thức ăn:** Mua sắm và quản lý động vật, thức ăn từ thương gia.
+- 🛍️ **Thương gia:** Ghé thăm mỗi 2 ngày với các mặt hàng ngẫu nhiên.
+- 📅 **Quản lý thời gian:** Mỗi ngày là một lượt chơi với giới hạn rút bài và chơi bài.
+- 💰 **Tính điểm:** Tính tổng điểm mỗi ngày dựa trên các lá bài được chơi và tài sản sở hữu.
+- 🗺️ **Bản đồ tile map:** Hệ thống bản đồ nông trại sử dụng PyTMX với tile 32x32.
+- 🖼️ **Giao diện tùy chỉnh:** Khung lá bài có thể bật tắt, hiệu ứng chọn bài nổi bật, bố cục vòng cung đẹp mắt.
+
+---
+
+## 🧱 Cấu trúc thư mục
+
+NongTraiVuiVe/ ├── assets/ │ ├── tiles/ │ │ └── summer farm tilemap.png │ └── images/ │ └── Fences.png ├── cards/ │ ├── Card.py │ ├── card_data.py ├── gameplay.py ├── player.py ├── merchant.py ├── tile_loader.py ├── calculateScore.py ├── main.py └── README.md
+
+---
+
+## 🛠️ Cài đặt & Chạy game
+
+### 1. Cài đặt thư viện cần thiết:
+
+pip install pygame pytmx
+
+###2. Chạy game:
+
+python main.py
