@@ -32,25 +32,26 @@ def main():
     clock = pygame.time.Clock()
 
     while True:
+        # Lấy sự kiện toàn cục
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
 
-        # Xử lý trạng thái menu
+        # Gọi hàm xử lý tương ứng với từng trạng thái
         if current_state == STATE_MENU:
             mouse_x, mouse_y = pygame.mouse.get_pos()
-            if start_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, mouse_x, mouse_y):
+            play_clicked = start_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, mouse_x, mouse_y)
+            if play_clicked:
                 current_state = STATE_GAMEPLAY
 
-        # Xử lý trạng thái gameplay
         elif current_state == STATE_GAMEPLAY:
             result = gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS)
             if result == "back_to_menu":
-                current_state = STATE_MENU
+                current_state = STATE_MENU  # Quay lại menu khi nhận được "back_to_menu"
 
-        pygame.display.flip()
         clock.tick(60)
 
 # Chạy game
-main()
+if __name__ == "__main__":
+    main()

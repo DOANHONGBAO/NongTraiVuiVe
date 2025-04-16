@@ -176,9 +176,8 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
                 sys.exit()
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                if show_score_summary:
-                    if confirm_button.collidepoint(event.pos):
-                        return "back_to_menu"
+                if show_score_summary and confirm_button.collidepoint(event.pos):
+                    return "back_to_menu"
                 if toggle_card_button.collidepoint(event.pos):
                     show_card_frame = not show_card_frame
 
