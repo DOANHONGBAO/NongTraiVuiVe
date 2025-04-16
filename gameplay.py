@@ -22,6 +22,13 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
     score_saved = False
     show_card_frame = True  # Khung bài đang hiển thị
 
+    new_chicken = Animal(
+        name="Gà",
+        cost=10,
+        x=random.randint(100, 600),
+        y=random.randint(400, 500)
+    )
+
 
     current_day = 1
     rolls_left = 1
@@ -31,7 +38,8 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
     BUTTON_WIDTH, BUTTON_HEIGHT = 300, 90
 
     merchant_buttons = []
-
+    animals_on_field = []
+    animals_on_field.append(new_chicken)
     def draw_cards():
         player.hand = player.draw_cards()
         for i in range(len(selected_card)):
@@ -101,6 +109,10 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
             (farm_button.x + 50, farm_button.y + 20),
             (farm_button.x + 50, farm_button.y + 100)
         ])
+
+        for animal in animals_on_field:
+            animal.update(WIDTH)
+            animal.draw(SCREEN)
 
         if "card_y_offsets" not in player.__dict__ or len(player.card_y_offsets) != len(player.hand):
             player.card_y_offsets = [random.randint(-5, 5) for _ in player.hand]
@@ -267,6 +279,17 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
                     for btn, item in merchant_buttons:
                         if btn.collidepoint(event.pos) and player.gold >= item.cost:
                             player.gold -= item.cost
+                            if isinstance(item, Animal) and item.name == "Gà":
+                                # Tạo một con gà có hình ảnh + vị trí random
+                                new_chicken = Animal(
+                                    name="Gà",
+                                    cost=item.cost,
+                                    x=random.randint(100, 600),
+                                    y=random.randint(400, 500),
+                                    right_frames=chicken_right_frames,
+                                    left_frames=chicken_left_frames
+                                )
+                                animals_on_field.append(new_chicken)
                             if isinstance(item, Animal):
                                 player.animals.append(item.name)
                             else:
