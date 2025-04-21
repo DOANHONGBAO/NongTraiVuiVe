@@ -17,18 +17,10 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
     show_merchant = True
     show_items = False
     buy_merchant = True
-
+    first_time = True
     show_score_summary = False
     score_saved = False
-    show_card_frame = True  # Khung bài đang hiển thị
-
-    new_chicken = Animal(
-        name="Gà",
-        cost=10,
-        x=random.randint(100, 600),
-        y=random.randint(400, 500)
-    )
-
+    show_card_frame = False  # Khung bài đang hiển thị
 
     current_day = 1
     rolls_left = 1
@@ -39,7 +31,8 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
 
     merchant_buttons = []
     animals_on_field = []
-    animals_on_field.append(new_chicken)
+    # animals_on_field.append(new_chicken)
+    # animals_on_field.append(new_pig)
     def draw_cards():
         player.hand = player.draw_cards()
         for i in range(len(selected_card)):
@@ -54,7 +47,6 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
         tilemap.draw(SCREEN)
 
         merchant_buttons.clear()
-
         # Thương gia mỗi 2 ngày
         if (current_day % 2 == 0) and buy_merchant:
             merchant = Merchant()
@@ -111,16 +103,16 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
         ])
 
         for animal in animals_on_field:
-            animal.update(WIDTH)
+            animal.update()
             animal.draw(SCREEN)
 
         if "card_y_offsets" not in player.__dict__ or len(player.card_y_offsets) != len(player.hand):
             player.card_y_offsets = [random.randint(-5, 5) for _ in player.hand]
 
-        if show_card_frame:
+        if show_card_frame or first_time:
             mouse_pos = pygame.mouse.get_pos()
             hovered_index = None
-
+            first_time = False
             num_cards = len(player.hand)
             card_spacing = 175
             total_width = (num_cards - 1) * card_spacing
@@ -152,7 +144,8 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
                 elif hovered_index == i:
                     rect.y += hover_offset
 
-                SCREEN.blit(card_img, rect.topleft)
+                if not first_time: 
+                    SCREEN.blit(card_img, rect.topleft)
 
                 # if selected_card[i]:
                 #     pygame.draw.rect(SCREEN, COLORS["YELLOW"], rect, 4)
@@ -172,7 +165,7 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
             for i, item in enumerate(merchant.items):
                 item_box = pygame.Rect(70 + i * (ITEM_WIDTH + 40), 300, ITEM_WIDTH, ITEM_HEIGHT)
                 pygame.draw.rect(SCREEN, COLORS["BROWN"], item_box)
-                item_text = FONT.render(str(item), True, COLORS["WHITE"])
+                item_text = FONT.render(item.name, True, COLORS["WHITE"])
                 SCREEN.blit(item_text, (item_box.x + 10, item_box.y + 10))
 
                 buy_btn = pygame.Rect(item_box.x + 80, item_box.y + 90, 140, 40)
@@ -279,19 +272,9 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
                     for btn, item in merchant_buttons:
                         if btn.collidepoint(event.pos) and player.gold >= item.cost:
                             player.gold -= item.cost
-                            if isinstance(item, Animal) and item.name == "Gà":
-                                # Tạo một con gà có hình ảnh + vị trí random
-                                new_chicken = Animal(
-                                    name="Gà",
-                                    cost=item.cost,
-                                    x=random.randint(100, 600),
-                                    y=random.randint(400, 500),
-                                    right_frames=chicken_right_frames,
-                                    left_frames=chicken_left_frames
-                                )
-                                animals_on_field.append(new_chicken)
                             if isinstance(item, Animal):
                                 player.animals.append(item.name)
+                                animals_on_field.append(item)
                             else:
                                 player.food.append(item.name)
                             merchant.items.remove(item)

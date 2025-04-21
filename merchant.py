@@ -8,23 +8,25 @@ class Merchant:
 
     def generate_items(self):
         items = []
-        for _ in range(3):  # Mỗi lần hiển thị 3 món
+        for _ in range(3):  # Hiển thị 3 món mỗi lần
             if random.random() < 0.5:
+                # Tạo động vật với vị trí ngẫu nhiên
                 animal = random.choice([
-                    Animal("Bò", 25),
-                    Animal("Gà", 15),
-                    # Animal("Heo", 20),
-                    # Animal("Cừu", 22),
-                    # Animal("Ngựa", 30),
-                    # Animal("Vịt", 12),
-                    # Animal("Thỏ", 10),
-                    # Animal("Chó", 18),
+                    Animal(name="Bò", cost=25, x=random.randint(100, 600), y=random.randint(400, 500)),
+                    Animal(name="Gà", cost=15, x=random.randint(100, 600), y=random.randint(400, 500)),
+                    Animal(name="Heo", cost=20, x=random.randint(100, 600), y=random.randint(400, 500)),
+                    Animal(name="Cừu", cost=22, x=random.randint(100, 600), y=random.randint(400, 500)),
+                    # Animal(name="Ngựa", cost=30, x=random.randint(100, 600), y=random.randint(400, 500)),
+                    # Animal(name="Vịt", cost=12, x=random.randint(100, 600), y=random.randint(400, 500)),
+                    # Animal(name="Thỏ", cost=10, x=random.randint(100, 600), y=random.randint(400, 500)),
+                    # Animal(name="Chó", cost=18, x=random.randint(100, 600), y=random.randint(400, 500)),
                 ])
                 items.append(animal)
             else:
+                # Tạo thực phẩm
                 food = random.choice([
                     Food("Thức ăn gia súc", 10),
-                    # Food("Cỏ khô", 5),
+                    Food("Cỏ khô", 5),
                     # Food("Ngũ cốc", 8),
                     # Food("Thức ăn hỗn hợp", 12),
                     # Food("Bắp", 7),
