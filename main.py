@@ -10,7 +10,7 @@ WIDTH, HEIGHT = 1915, 1020
 SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption(" Nông Trại Vui Vẻ ")
 
-start_background_music() # Bắt đầu nhạc nền
+# start_background_music() # Bắt đầu nhạc nền
 
 # Màu sắc và font
 COLORS = {
@@ -20,7 +20,9 @@ COLORS = {
     "BLACK": (0, 0, 0),
     "YELLOW": (255, 215, 0),
     "BROWN": (160, 100, 50),
-    "LIGHT_GREEN": (180, 255, 180)  # Thêm dòng này để tránh lỗi
+    "LIGHT_GREEN": (180, 255, 180),  # Thêm dòng này để tránh lỗi
+    "DARK_GRAY" : (125,125,125),
+    "LIGHT_BROWN" : (3,3,3)
 }
 
 FONT = pygame.font.Font("assets/fonts/arcade-among-1.otf", 24)
@@ -51,7 +53,7 @@ def main():
         # Gọi hàm xử lý tương ứng với từng trạng thái
         if current_state == STATE_MENU:
             mouse_x, mouse_y = pygame.mouse.get_pos()
-            play_clicked = start_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, mouse_x, mouse_y)
+            play_clicked = start_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS)
             if play_clicked:
                 current_state = STATE_GAMEPLAY
 

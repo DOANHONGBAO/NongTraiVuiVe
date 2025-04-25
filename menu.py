@@ -1,38 +1,55 @@
 import pygame
 import sys
+from GUI import ImageButton
 
+def start_screen(screen, width, height, font, big_font, colors):
+    clock = pygame.time.Clock()
 
-def start_screen(screen, width, height, font, big_font, colors, mouse_x=None, mouse_y=None):
+    # Load background
     background_img = pygame.image.load("assets/images/BG.jpeg").convert()
     background_img = pygame.transform.scale(background_img, (width, height))
-    screen.blit(background_img, (0, 0))
 
-    # Load và hiển thị tiêu đề
+    # Load title
     title_img = pygame.image.load("assets/images/title_only.png").convert_alpha()
-    title_img = pygame.transform.scale(title_img, (int(title_img.get_width() * 0.7), int(title_img.get_height() * 0.7)))
+    title_img = pygame.transform.scale(title_img, (
+        int(title_img.get_width() * 0.7),
+        int(title_img.get_height() * 0.7)
+    ))
     title_rect = title_img.get_rect(center=(width // 2, height // 3))
-    screen.blit(title_img, title_rect)
 
-    # Load và hiển thị nút Play
+    # Load button images
     play_img = pygame.image.load("assets/images/play_button_only.png").convert_alpha()
-    play_img = pygame.transform.scale(play_img, (int(play_img.get_width() * 0.7), int(play_img.get_height() * 0.7)))
-    play_rect = play_img.get_rect(center=(width // 2, height // 1.5))
+    try:
+        play_img_hover = pygame.image.load("assets/images/play_button_hover.png").convert_alpha()
+    except:
+        play_img_hover = play_img  # fallback nếu không có hover riêng
 
-    # Kiểm tra nếu chuột hover vào nút Play
-    if play_rect.collidepoint(mouse_x, mouse_y):
-        # Tăng kích thước nút khi hover
-        play_img = pygame.transform.scale(play_img, (int(play_img.get_width() * 0.95), int(play_img.get_height() * 0.95)))
-        play_rect = play_img.get_rect(center=(width // 2, height // 1.5))
-    screen.blit(play_img, play_rect)
+    # Tạo ImageButton
+    button_width = int(play_img.get_width() * 0.7)
+    button_height = int(play_img.get_height() * 0.7)
+    play_btn = ImageButton(
+        width // 2 - button_width // 2, int(height // 1.5) - button_height // 2,
+        button_width, button_height,
+        "", font,
+        (0, 0, 0),  # không có chữ nên không quan trọng
+        play_img, play_img_hover
+    )
 
-    # Kiểm tra nếu chuột nhấn vào nút Play
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            if play_rect.collidepoint(event.pos):  # Nếu click vào nút Play
-                return True  # Quay về True khi Play được nhấn
-    
-    pygame.display.flip()
-    return False  # Không làm gì nếu không nhấn Play
+    while True:
+        mouse_pos = pygame.mouse.get_pos()
+        screen.blit(background_img, (0, 0))
+        screen.blit(title_img, title_rect)
+
+        # Vẽ nút Play
+        play_btn.draw(screen, mouse_pos)
+
+        # Xử lý sự kiện
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif play_btn.is_clicked(event):
+                return True
+
+        pygame.display.flip()
+        clock.tick(60)
