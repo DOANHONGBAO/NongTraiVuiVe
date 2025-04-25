@@ -33,8 +33,7 @@ fields = [
     Field(1266, 532, 1422, 781, 4, 7),  # field12
 ]
 
-def farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, current_day):
-    clock = pygame.time.Clock()
+def farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, current_day,clock):
     BUTTON_WIDTH, BUTTON_HEIGHT = 300, 90
     plants = create_plants()
 

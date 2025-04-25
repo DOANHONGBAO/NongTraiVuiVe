@@ -2,8 +2,7 @@ import pygame
 import sys
 from GUI import ImageButton
 
-def start_screen(screen, width, height, font, big_font, colors):
-    clock = pygame.time.Clock()
+def start_screen(screen, width, height, font, big_font, colors,clock):
 
     # Load background
     background_img = pygame.image.load("assets/images/BG.jpeg").convert()

@@ -18,8 +18,10 @@ from GUI import ImageButton
 
 # Global constants
 CARD_WIDTH, CARD_HEIGHT = 200, 300
-ITEM_WIDTH, ITEM_HEIGHT = 300, 450
+ITEM_WIDTH, ITEM_HEIGHT = 30, 45
 BUTTON_WIDTH, BUTTON_HEIGHT = 300, 90
+toolbar_width = 800
+toolbar_height = 126
 
 merchant_buttons = []
 animals_on_field = []
@@ -27,8 +29,15 @@ feed_bar_slots = [None] * 9
 food_inventory = []
 selected_card = [False, False, False, False, False]
 player = Player()
+shelf_positions = [
+    (473, 378,703, 528),  # Shelf 1: (left, top, right, down)
+    (941, 378,1182, 531),# Shelf 2
+    (474, 536,715, 682),  # Shelf 3
+    (946, 534,1245, 686),# Shelf 4
 
-def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
+]
+
+def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock):
     """
     Main gameplay loop where the game is played.
     Handles rendering, interaction logic, card drawing, animal display, and UI interactions.
@@ -51,6 +60,11 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
 
     # Buttons
     # Load hình ảnh
+    toolbar_image = pygame.image.load("assets/images/toolbar.png").convert_alpha()
+    shop_image = pygame.image.load("assets/images/merchant.png").convert_alpha()
+    shop_image = pygame.transform.scale(shop_image, (1200, 800))  # nếu cần resize
+    pot_image = pygame.image.load("assets/images/pot.png").convert_alpha()
+    pot_image = pygame.transform.scale(pot_image, (223, 181))  # nếu chưa đúng kích thước thì resize lại
     # Tải hình ảnh nút
     image_normal = pygame.image.load("assets/GUI/ButtonsText/ButtonText_Large_GreyOutline_Round.png").convert_alpha()
     image_hover = pygame.image.load("assets/GUI/ButtonsText/ButtonText_Large_Orange_Round.png").convert_alpha()
@@ -59,7 +73,10 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
     image_triangle = pygame.image.load("assets/GUI/Sliders/ScrollSlider_Arrow.png").convert_alpha()
     image_triangle = pygame.transform.rotate(image_triangle, 180)
     image_triangle = pygame.transform.scale(image_triangle, (60, 60))
-
+    #Tải hình ảnh quay lại
+    image_return = pygame.image.load("assets/GUI/Icons/Icon_Small_WhiteOutline_Arrow.png").convert_alpha()
+    image_return = pygame.transform.rotate(image_return,180)
+    image_return_hover = pygame.image.load("assets/GUI/Icons/Icon_Small_Blank_Arrow.png").convert_alpha()
     # Tạo các nút sử dụng ImageButton với hiệu ứng hover
     back_btn = ImageButton(
         WIDTH - BUTTON_WIDTH - 30, 30, BUTTON_WIDTH, BUTTON_HEIGHT,
@@ -118,10 +135,10 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
     )
 
     back_merchant_btn = ImageButton(
-        420, 500, BUTTON_WIDTH, 60,
-        "⬅️ Không mua nữa", FONT,
+        1375, 158, 120, 90,
+        "",FONT,
         (255, 255, 255),
-        image_normal, image_hover,
+        image_return, image_return,
         hover_text_color=(255, 255, 0)
     )
     confirm_btn = ImageButton(
@@ -156,6 +173,13 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
         SCREEN.blit(BIG_FONT.render(f"Ngày {current_day}", True, COLORS["BLACK"]), (30, 100))
         SCREEN.blit(FONT.render(f"Lượt roll còn lại: {rolls_left}", True, COLORS["BLACK"]), (30, 220))
 
+
+        # Vị trí để đặt ảnh thanh công cụ ở giữa dưới
+        toolbar_x = (1900 - toolbar_width) // 2
+        toolbar_y = 1000 - toolbar_height
+
+        # Vẽ ảnh thanh công cụ
+        SCREEN.blit(toolbar_image, (toolbar_x, toolbar_y))
         # Buttons rendering
         for btn in [back_btn, next_day_btn, roll_btn, play_btn, toggle_card_btn,farm_btn]:
             btn.draw(SCREEN, mouse_pos)
@@ -164,6 +188,7 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
         for animal in animals_on_field:
             animal.update()
             animal.draw(SCREEN)
+        
 
         # Card logic
         if "card_y_offsets" not in player.__dict__ or len(player.card_y_offsets) != len(player.hand):
@@ -176,7 +201,7 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
             total_width = (num_cards - 1) * card_spacing
             start_x = WIDTH // 2 - total_width // 2
             card_height = player.hand[0].get_image().get_height()
-            base_y = HEIGHT - card_height - 30
+            base_y = HEIGHT - card_height - 30 - 124
             hover_offset = -20
             select_offset = -40
 
@@ -207,23 +232,40 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
         if show_merchant and not show_items:
             see_items_btn.draw(SCREEN,mouse_pos)
 
+
         elif show_merchant and show_items:
+            # Xác định kích thước của cửa hàng
+            shop_width = shop_image.get_width() # 1200
+            shop_height = shop_image.get_height() #800
+
+            # Tính toán vị trí của cửa hàng sao cho nó nằm ở giữa màn hình
+            screen_width, screen_height = SCREEN.get_size()  # Kích thước màn hình
+            shop_x = (screen_width - shop_width) // 2
+            shop_y = (screen_height - shop_height) // 2
+
+            # Vẽ cửa hàng ở giữa màn hình
+            SCREEN.blit(shop_image, (shop_x, shop_y))
+
+            # Vẽ các item trong cửa hàng
             for i, item in enumerate(merchant.items):
-                item_box = pygame.Rect(70 + i * (ITEM_WIDTH + 40), 300, ITEM_WIDTH, ITEM_HEIGHT)
-                pygame.draw.rect(SCREEN, COLORS["BROWN"], item_box)
+                if i < len(shelf_positions):
+                    left, top, right, bottom = shelf_positions[i]
 
-                item_text = FONT.render(item.name, True, COLORS["WHITE"])
-                SCREEN.blit(item_text, (item_box.x + 10, item_box.y + 10))
-                price_text = FONT.render(f"{item.cost} vàng", True, COLORS["YELLOW"])
-                SCREEN.blit(price_text, (item_box.x + 10, item_box.y + 50))
+                    shelf_center_x = (left + right) // 2
+                    shelf_center_y = (top + bottom) // 2
 
-                buy_btn = pygame.Rect(item_box.x + 10, item_box.y + 90, 140, 40)
-                pygame.draw.rect(SCREEN, COLORS["DARK_GREEN"], buy_btn)
-                buy_text = FONT.render("Mua", True, COLORS["WHITE"])
-                buy_text_rect = buy_text.get_rect(center=buy_btn.center)
-                SCREEN.blit(buy_text, buy_text_rect)
+                    item_box = pygame.Rect(0, 0, 223, 181)
+                    item_box.center = (shelf_center_x, shelf_center_y - 10)
 
-                merchant_buttons.append((buy_btn, item))
+                    # Vẽ ảnh pot thay cho khung chữ nhật
+                    SCREEN.blit(pot_image, pot_image.get_rect(center=item_box.center))
+
+                    # Vẽ tên item
+                    item_text = FONT.render(item.name, True, COLORS["WHITE"])
+                    SCREEN.blit(item_text, (item_box.x + 5, item_box.y + 5))
+
+
+                    merchant_buttons.append((item_box, item))  # Lưu item_box thay vì buy_btn
 
             back_merchant_btn.draw(SCREEN,mouse_pos)
 
@@ -236,6 +278,7 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
                 sys.exit()
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
+                print(mouse_pos)
                 if show_card_frame:
                     for i, card in enumerate(player.hand):
                         card_x = start_x + i * card_spacing
@@ -259,8 +302,9 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
                         show_items = True
 
                 elif show_merchant and show_items:
-                    for btn, item in merchant_buttons:
-                        if btn.collidepoint(event.pos) and player.gold >= item.cost:
+                    for item_box, item in merchant_buttons:  # Đổi từ (btn, item) sang (item_box, item)
+                        # Kiểm tra click vào pot_image
+                        if item_box.collidepoint(event.pos) and player.gold >= item.cost:
                             player.gold -= item.cost
 
                             if isinstance(item, Animal):
@@ -274,6 +318,7 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS):
 
                     if back_merchant_btn.is_clicked(event):
                         show_items = False
+
 
                 if show_score_summary and confirm_btn.is_clicked(event):
                     return "main_menu"

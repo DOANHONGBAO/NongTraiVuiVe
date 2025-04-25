@@ -53,12 +53,12 @@ def main():
         # Gọi hàm xử lý tương ứng với từng trạng thái
         if current_state == STATE_MENU:
             mouse_x, mouse_y = pygame.mouse.get_pos()
-            play_clicked = start_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS)
+            play_clicked = start_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock)
             if play_clicked:
                 current_state = STATE_GAMEPLAY
 
         elif current_state == STATE_GAMEPLAY:
-            result = gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS)
+            result = gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock)
             if isinstance(result, tuple):
                     action, player, current_day = result
                     if action == "go_to_farming":
@@ -68,7 +68,7 @@ def main():
             elif result == "back_to_menu":
                     current_state = STATE_MENU
         elif current_state == STATE_FARMING:
-            result = farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, current_day)
+            result = farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, current_day,clock)
             if result == "back_to_gameplay":
                 current_state = STATE_GAMEPLAY
 
