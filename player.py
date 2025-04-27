@@ -3,12 +3,13 @@ from card import Card
 
 class Player:
     def __init__(self):
-        self.gold = 50
+        self.gold = 5000
         self.animals = []
         self.food = []
         self.hand = self.draw_cards()
         self.score_multiplier = 1  # Hệ số nhân điểm mặc định là 1
         self.score_exponent = 1  # Hệ số lũy thừa mặc định là 1
+        self.inventory = []
 
     def draw_cards(self):
         # Các lá bài sự kiện (bao gồm cộng, trừ điểm và bốc thêm lá)

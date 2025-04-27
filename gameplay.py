@@ -15,20 +15,28 @@ from animal import Animal
 from calculateScore import calculate_score, save_score
 from tiles import TileMap
 from GUI import ImageButton
-
+from items import Slot,Inventory
+import chess
 # Global constants
 CARD_WIDTH, CARD_HEIGHT = 200, 300
 ITEM_WIDTH, ITEM_HEIGHT = 30, 45
 BUTTON_WIDTH, BUTTON_HEIGHT = 300, 90
 toolbar_width = 800
 toolbar_height = 126
-
+# Vị trí để đặt ảnh thanh công cụ ở giữa dưới
+toolbar_x = (1900 - toolbar_width) // 2
+toolbar_y = 1000 - toolbar_height
+inventory_x = toolbar_x
+inventory_y = toolbar_y - 460
+toolbar_slots = []
+yard = []
 merchant_buttons = []
 animals_on_field = []
 feed_bar_slots = [None] * 9
 food_inventory = []
 selected_card = [False, False, False, False, False]
 player = Player()
+
 shelf_positions = [
     (473, 378,703, 528),  # Shelf 1: (left, top, right, down)
     (941, 378,1182, 531),# Shelf 2
@@ -36,12 +44,35 @@ shelf_positions = [
     (946, 534,1245, 686),# Shelf 4
 
 ]
+raw_positions = [
+    ((578, 903), (645, 966)),
+    ((655, 904), (719, 966)),
+    ((729, 906), (792, 968)),
+    ((804, 905), (868, 966)),
+    ((880, 903), (941, 966)),
+    ((955, 903), (1019, 965)),
+    ((1031, 904), (1094, 963)),
+    ((1105, 905), (1171, 969)),
+    ((1178, 901), (1246, 970)),
+    ((1259, 906), (1322, 970))
+]
+
+slot_positions = [Slot(topleft, bottomright) for topleft, bottomright in raw_positions]
+inventory = Inventory(slot_positions)
 
 def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock):
     """
     Main gameplay loop where the game is played.
     Handles rendering, interaction logic, card drawing, animal display, and UI interactions.
     """
+    # def mua_vat_pham():
+    #     print("Muốn mua vật phẩm? Phải đánh thắng người bán trước!")
+    #     if chess.start_chess_battle_overlay(SCREEN):
+    #         print("Bạn thắng! Mua thành công!")
+    #         # Cho phép mua
+    #     else:
+    #         print("Bạn thua! Không được mua!")
+    show_inventory = False
     show_feed_ui = False
     clock = pygame.time.Clock()
     count_select_one_day = 3
@@ -55,12 +86,18 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock):
     show_card_frame = False
     current_day = 1
     rolls_left = 1
+    # Biến lưu trạng thái kéo chọn vùng
+    selecting = False
+    start_pos = (0, 0)
+    current_pos = (-1, -1)
+    selection_rect = None
     merchant_buttons = []  # Reset mỗi frame
     tilemap = TileMap("assets/tiles/background.tmx")
 
     # Buttons
     # Load hình ảnh
     toolbar_image = pygame.image.load("assets/images/toolbar.png").convert_alpha()
+    inventory_image = pygame.image.load("assets/images/inventory.png").convert_alpha()
     shop_image = pygame.image.load("assets/images/merchant.png").convert_alpha()
     shop_image = pygame.transform.scale(shop_image, (1200, 800))  # nếu cần resize
     pot_image = pygame.image.load("assets/images/pot.png").convert_alpha()
@@ -73,6 +110,8 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock):
     image_triangle = pygame.image.load("assets/GUI/Sliders/ScrollSlider_Arrow.png").convert_alpha()
     image_triangle = pygame.transform.rotate(image_triangle, 180)
     image_triangle = pygame.transform.scale(image_triangle, (60, 60))
+    image_btn_see_inventory = pygame.image.load("assets/GUI/ButtonsIcons/IconButton_Large_Circle.png").convert_alpha()
+    image_see_inventory_hover = pygame.image.load("assets/GUI/ButtonsIcons/IconButton_Large_GreyOutline_Circle.png").convert_alpha()
     #Tải hình ảnh quay lại
     image_return = pygame.image.load("assets/GUI/Icons/Icon_Small_WhiteOutline_Arrow.png").convert_alpha()
     image_return = pygame.transform.rotate(image_return,180)
@@ -126,6 +165,14 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock):
         image_triangle  # có thể dùng cùng một hình cho hover nếu không có ảnh riêng
     )
 
+    see_inventory_btn = ImageButton(
+        1370, 883, 100, 100,
+        "", FONT,
+        (255, 255, 255),
+        image_btn_see_inventory, image_see_inventory_hover,
+        hover_text_color=(255, 255, 0)
+    )
+
     see_items_btn = ImageButton(
         50, 300, BUTTON_WIDTH, 60,
         "Xem hàng từ thương gia", FONT,
@@ -173,21 +220,28 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock):
         SCREEN.blit(BIG_FONT.render(f"Ngày {current_day}", True, COLORS["BLACK"]), (30, 100))
         SCREEN.blit(FONT.render(f"Lượt roll còn lại: {rolls_left}", True, COLORS["BLACK"]), (30, 220))
 
-
-        # Vị trí để đặt ảnh thanh công cụ ở giữa dưới
-        toolbar_x = (1900 - toolbar_width) // 2
-        toolbar_y = 1000 - toolbar_height
-
-        # Vẽ ảnh thanh công cụ
-        SCREEN.blit(toolbar_image, (toolbar_x, toolbar_y))
-        # Buttons rendering
-        for btn in [back_btn, next_day_btn, roll_btn, play_btn, toggle_card_btn,farm_btn]:
-            btn.draw(SCREEN, mouse_pos)
-
         # Animal drawing
         for animal in animals_on_field:
             animal.update()
             animal.draw(SCREEN)
+
+        # Vẽ ảnh thanh công cụ
+        SCREEN.blit(toolbar_image, (toolbar_x, toolbar_y))
+
+        #slot_toolbar
+        for slot in slot_positions:
+            slot.draw(SCREEN,FONT)
+
+        if show_inventory:
+            # print("yes")
+            SCREEN.blit(inventory_image, (inventory_x, inventory_y))
+
+        # Buttons rendering
+        for btn in [back_btn, next_day_btn, roll_btn, play_btn, toggle_card_btn,farm_btn,see_inventory_btn]:
+            btn.draw(SCREEN, mouse_pos)
+
+
+
         
 
         # Card logic
@@ -268,7 +322,14 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock):
                     merchant_buttons.append((item_box, item))  # Lưu item_box thay vì buy_btn
 
             back_merchant_btn.draw(SCREEN,mouse_pos)
-
+        if selecting and current_pos != (-1,-1):
+            x1, y1 = start_pos
+            x2, y2 = current_pos
+            left = min(x1, x2)
+            top = min(y1, y2)
+            width = abs(x1 - x2)
+            height = abs(y1 - y2)
+            pygame.draw.rect(SCREEN, (0, 255, 0), (left, top, width, height), 2)
         if show_score_summary:
             confirm_btn.draw(SCREEN, mouse_pos)
 
@@ -278,7 +339,11 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock):
                 sys.exit()
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                print(mouse_pos)
+                # print(mouse_pos)
+                if event.button == 3 :
+                    start_pos = mouse_pos
+                    selecting = True
+
                 if show_card_frame:
                     for i, card in enumerate(player.hand):
                         card_x = start_x + i * card_spacing
@@ -306,7 +371,7 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock):
                         # Kiểm tra click vào pot_image
                         if item_box.collidepoint(event.pos) and player.gold >= item.cost:
                             player.gold -= item.cost
-
+                            # mua_vat_pham()
                             if isinstance(item, Animal):
                                 player.animals.append(item.name)
                                 animals_on_field.append(item)
@@ -348,8 +413,36 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock):
                 if roll_btn.is_clicked(event) and rolls_left > 0:
                     draw_cards()
                     rolls_left -= 1
+                if see_inventory_btn.is_clicked(event):
+                    show_inventory = not show_inventory
                 if farm_btn.is_clicked(event):
+            
                     return "go_to_farming", player, current_day
+            elif event.type == pygame.MOUSEMOTION:
+                if selecting:
+                    current_pos = mouse_pos
+            elif event.type == pygame.MOUSEBUTTONUP and event.button == 3:
+                selecting = False
+                end_pos = mouse_pos
+                current_pos = (-1,-1)
+                # Tính vùng chọn
+                x1, y1 = start_pos
+                x2, y2 = end_pos
+                left = min(x1, x2)
+                top = min(y1, y2)
+                width = abs(x1 - x2)
+                height = abs(y1 - y2)
+                selection_rect = pygame.Rect(left, top, width, height)
 
+                # Kiểm tra vật phẩm nào nằm trong vùng
+                collected_items = []
+                for item in yard:
+                    if selection_rect.colliderect(item.rect):
+                        inventory.add_item(item)  # Thêm vào kho
+                        collected_items.append(item)
+
+                # Xóa các item đã thu thập khỏi yard
+                for item in collected_items:
+                    yard.remove(item)      
         pygame.display.update()
         clock.tick(60)
