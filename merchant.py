@@ -16,6 +16,7 @@ class Merchant:
                     Animal(name="Gà", cost=15, x=random.randint(100, 600), y=random.randint(400, 500)),
                     Animal(name="Heo", cost=20, x=random.randint(100, 600), y=random.randint(400, 500)),
                     Animal(name="Cừu", cost=22, x=random.randint(100, 600), y=random.randint(400, 500)),
+                    Animal(name="Dê", cost=22, x=random.randint(100, 600), y=random.randint(400, 500)),
                     # Animal(name="Ngựa", cost=30, x=random.randint(100, 600), y=random.randint(400, 500)),
                     # Animal(name="Vịt", cost=12, x=random.randint(100, 600), y=random.randint(400, 500)),
                     # Animal(name="Thỏ", cost=10, x=random.randint(100, 600), y=random.randint(400, 500)),

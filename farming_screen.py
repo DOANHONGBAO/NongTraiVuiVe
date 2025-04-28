@@ -4,17 +4,21 @@ import pytmx
 from GUI import ImageButton
 from plant import Plant,Field
 import random
-from items import Slot,Inventory
+from items import Slot,Inventory,HarvestNotification
 def create_plants():
     # Hình ảnh các giai đoạn phát triển của các loại cây
     carrot_images = [pygame.image.load(f"assets/plants/carrot/carrot{i}.png").convert_alpha() for i in range(4)]
     corn_images = [pygame.image.load(f"assets/plants/corn/corn{i}.png").convert_alpha() for i in range(4)]
     straw_berry_images = [pygame.image.load(f"assets/plants/straw_berry/straw_berry{i}.png").convert_alpha() for i in range(4)]
+    carbage_images = [pygame.image.load(f"assets/plants/carbage/carbage{i}.png").convert_alpha() for i in range(4)]
+    rice_images = [pygame.image.load(f"assets/plants/rice/rice{i}.png").convert_alpha() for i in range(4)]
     # Tạo các cây
     plants = [
         Plant(name="Carrot", x=0, y=0, growth_stages=[0, 1, 2, 3], growth_time=4000, images=carrot_images,index = 0,indexob = 2),
         Plant(name="Corn", x=0, y=0, growth_stages=[0, 1, 2, 3], growth_time=10000, images=corn_images,indexob = 7),
         Plant(name="Straw_berry", x=0, y=0, growth_stages=[0, 1, 2, 3], growth_time=10000, images=straw_berry_images, indexob = 4),
+        Plant(name="Carbage", x=0, y=0, growth_stages=[0, 1, 2, 3], growth_time=10000, images=carbage_images, indexob = 28),
+        Plant(name="Rice", x=0, y=0, growth_stages=[0, 1, 2, 3], growth_time=10000, images=ric, indexob = 3),
     ]
     
     return plants
@@ -78,19 +82,41 @@ raw_positions = [
     ((1259, 906), (1322, 970))
 ]
 
+raw_inventory_position = [
+    ((578, 444), (652, 516)), ((652, 444), (726, 516)), ((726, 444), (800, 516)), ((800, 444), (874, 516)), ((874, 444), (948, 516)),
+    ((948, 444), (1022, 516)), ((1022, 444), (1096, 516)), ((1096, 444), (1170, 516)), ((1170, 444), (1244, 516)), ((1244, 444), (1318, 516)),
+
+    ((578, 516), (652, 588)), ((652, 516), (726, 588)), ((726, 516), (800, 588)), ((800, 516), (874, 588)), ((874, 516), (948, 588)),
+    ((948, 516), (1022, 588)), ((1022, 516), (1096, 588)), ((1096, 516), (1170, 588)), ((1170, 516), (1244, 588)), ((1244, 516), (1318, 588)),
+
+    ((578, 588), (652, 660)), ((652, 588), (726, 660)), ((726, 588), (800, 660)), ((800, 588), (874, 660)), ((874, 588), (948, 660)),
+    ((948, 588), (1022, 660)), ((1022, 588), (1096, 660)), ((1096, 588), (1170, 660)), ((1170, 588), (1244, 660)), ((1244, 588), (1318, 660)),
+
+    ((578, 660), (652, 734)), ((652, 660), (726, 734)), ((726, 660), (800, 734)), ((800, 660), (874, 734)), ((874, 660), (948, 734)),
+    ((948, 660), (1022, 734)), ((1022, 660), (1096, 734)), ((1096, 660), (1170, 734)), ((1170, 660), (1244, 734)), ((1244, 660), (1318, 734)),
+
+    ((578, 734), (652, 808)), ((652, 734), (726, 808)), ((726, 734), (800, 808)), ((800, 734), (874, 808)), ((874, 734), (948, 808)),
+    ((948, 734), (1022, 808)), ((1022, 734), (1096, 808)), ((1096, 734), (1170, 808)), ((1170, 734), (1244, 808)), ((1244, 734), (1318, 808)),
+]
+
+
+inventory_position = [Slot(topleft,bottomright) for topleft,bottomright in raw_inventory_position] 
+inventory = Inventory(inventory_position)
+
 slot_positions = [Slot(topleft, bottomright) for topleft, bottomright in raw_positions]
-inventory = Inventory(slot_positions)
+toolbar = Inventory(slot_positions)
+
 def farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, current_day,clock):
     BUTTON_WIDTH, BUTTON_HEIGHT = 300, 90
     plants = create_plants()
-
+    harvest_notifications = []
     # Biến lưu trạng thái kéo chọn vùng
     show_inventory = False
     selecting = False
     start_pos = (0, 0)
     current_pos = (-1, -1)
     selection_rect = None
-
+    dragging_item = None
     # Load hình ảnh nút
     toolbar_image = pygame.image.load("assets/images/toolbar.png").convert_alpha()
     image_normal = pygame.image.load("assets/GUI/ButtonsText/ButtonText_Large_GreyOutline_Round.png").convert_alpha()
@@ -119,7 +145,7 @@ def farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, curren
     tmx_data = pytmx.load_pygame("assets/tiles/background_farm.tmx")
     inventory_image = pygame.image.load("assets/images/inventory.png").convert_alpha()
     
-    selected_plant = plants[1]  # Biến lưu cây được chọn để trồng
+    selected_plant = plants[3]  # Biến lưu cây được chọn để trồng
 
     while True:
         mouse_pos = pygame.mouse.get_pos()
@@ -149,24 +175,39 @@ def farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, curren
 
         # Vẽ các cây đã trồng trong các thửa ruộng
         for field in fields:
+            if field.plants:
+                # Nếu tất cả cây trong field đều chín
+                if all(plant.is_ready_to_harvest() for plant in field.plants):
+                    already_has_notification = any(
+                        hasattr(noti, "field_id") and noti.field_id == id(field) for noti in harvest_notifications
+                    )
+                    if not already_has_notification:
+                        # Nếu chưa có noti thì tạo mới
+                        first_plant = field.plants[0]
+                        noti = HarvestNotification(first_plant.images[-1])
+                        noti.field_id = id(field)
+                        noti.x = field.rect.centerx
+                        noti.y = field.rect.top - 30
+                        harvest_notifications.append(noti)
+            else:
+                # Nếu field.plants == [] (đã thu hoạch hết) ➔ Xóa noti của field này
+                harvest_notifications = [n for n in harvest_notifications if not (hasattr(n, "field_id") and n.field_id == id(field))]
+
             for plant in field.plants:
-                plant.update(clock.get_time())  # Cập nhật sự phát triển của cây
-                plant.draw(SCREEN)  # Vẽ cây lên màn hình
-                if plant.is_ready_to_harvest() and plant.index == 13:
-                    # Vẽ thông báo "Có thể thu hoạch"
-                    font = pygame.font.SysFont(None, 20)
-                    text = font.render("Thu hoạch!", True, (255, 255, 0))  # Màu vàng
-                    text_rect = text.get_rect(midbottom=(plant.x + 16, plant.y - 5))  # Giữa cây
-                    SCREEN.blit(text, text_rect)
-        # Vẽ items có trên yard
+                plant.update(clock.get_time())
+                plant.draw(SCREEN)
+        # Update và Draw tất cả harvest notifications
+        for noti in harvest_notifications:
+            # noti.update()  # nhớ chia 1000 để ra giây
+            noti.draw(SCREEN)
+
+        # Xóa noti hết hạn
+        harvest_notifications = [n for n in harvest_notifications if n.timer > 0]
+
         for item in yard:
             item.draw(SCREEN)
             item.update()
-        # Vẽ ảnh thanh công cụ
-        SCREEN.blit(toolbar_image, (toolbar_x, toolbar_y))
-        #slot_toolbar
-        for slot in slot_positions:
-           slot.draw(SCREEN,FONT)
+
         if selecting and current_pos != (-1,-1):
             x1, y1 = start_pos
             x2, y2 = current_pos
@@ -180,6 +221,19 @@ def farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, curren
             btn.draw(SCREEN, mouse_pos)
         if show_inventory: 
             SCREEN.blit(inventory_image, (inventory_x, inventory_y))
+            for slot in inventory_position:
+                slot.draw(SCREEN,FONT)
+        # Vẽ ảnh thanh công cụ
+        SCREEN.blit(toolbar_image, (toolbar_x, toolbar_y))
+        #slot_toolbar
+        for slot in slot_positions:
+            slot.draw(SCREEN,FONT)
+        if dragging_item:
+            _, dragging_image, dragging_quantity = dragging_item
+            if dragging_image:
+                item_rect = dragging_image.image.get_rect(center=mouse_pos)
+                SCREEN.blit(dragging_image.image, item_rect.topleft)
+    
         # ===== XỬ LÝ SỰ KIỆN =====
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -192,42 +246,87 @@ def farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, curren
                     start_pos = mouse_pos
                     selecting = True
                 #Giả sử bạn có object `selected_plant` để trồng lại
-                for field in fields:
-                    if field.is_clicked(mouse_pos) and event.button == 1:
-                        field.plant_crops(selected_plant, selected_plant.images)
-                        dropped = field.try_harvest()
-                        yard.extend(dropped)
+                if not show_inventory : 
+                    for field in fields:
+                        if field.is_clicked(mouse_pos) and event.button == 1:
+                            field.plant_crops(selected_plant, selected_plant.images)
+                            dropped = field.try_harvest()
+                            yard.extend(dropped)
                 if see_inventory_btn.is_clicked(event):
                     show_inventory = not show_inventory
+                if event.button == 1:  # Chuột trái
+                    if show_inventory:
+                        for slot in inventory.slots:
+                            if slot.is_hovered(mouse_pos) and slot.item:
+                                dragging_item = (slot, slot.item, slot.quantity)
+                                slot.clear()
+                                break
+                    if not dragging_item:
+                        for slot in toolbar.slots:
+                            if slot.is_hovered(mouse_pos) and slot.item:
+                                dragging_item = (slot, slot.item, slot.quantity)
+                                slot.clear()
+                                break
                 # Kiểm tra nếu click vào nút "Quay lại Game"
                 if back_btn.is_clicked(event):  # ✅ Sửa lỗi truyền tuple
                     return "back_to_gameplay"
             elif event.type == pygame.MOUSEMOTION:
                 if selecting:
                     current_pos = mouse_pos
-            elif event.type == pygame.MOUSEBUTTONUP and event.button == 3:
-                selecting = False
-                end_pos = mouse_pos
-                current_pos = (-1,-1)
-                # Tính vùng chọn
-                x1, y1 = start_pos
-                x2, y2 = end_pos
-                left = min(x1, x2)
-                top = min(y1, y2)
-                width = abs(x1 - x2)
-                height = abs(y1 - y2)
-                selection_rect = pygame.Rect(left, top, width, height)
+            elif event.type == pygame.MOUSEBUTTONUP:
+                if event.button == 3:
+                    selecting = False
+                    end_pos = mouse_pos
+                    current_pos = (-1,-1)
+                    # Tính vùng chọn
+                    x1, y1 = start_pos
+                    x2, y2 = end_pos
+                    left = min(x1, x2)
+                    top = min(y1, y2)
+                    width = abs(x1 - x2)
+                    height = abs(y1 - y2)
+                    selection_rect = pygame.Rect(left, top, width, height)
 
-                # Kiểm tra vật phẩm nào nằm trong vùng
-                collected_items = []
-                for item in yard:
-                    if selection_rect.colliderect(item.rect):
-                        inventory.add_item(item)  # Thêm vào kho
-                        collected_items.append(item)
+                    # Kiểm tra vật phẩm nào nằm trong vùng
+                    collected_items = []
+                    for item in yard:
+                        if selection_rect.colliderect(item.rect):
+                            if not inventory.add_item(item):  # nếu inventory đầy
+                                inventory.add_item(item)
+                            collected_items.append(item)
 
-                # Xóa các item đã thu thập khỏi yard
-                for item in collected_items:
-                    yard.remove(item)      
+                    # Xóa các item đã thu thập khỏi yard
+                    for item in collected_items:
+                        yard.remove(item)      
+                if event.button == 1 and dragging_item:
+                    from_slot, item, quantity = dragging_item
+                    placed = False
+                    if show_inventory:
+                        for slot in inventory.slots:
+                            if slot.is_hovered(mouse_pos):
+                                if slot.item is None:
+                                    slot.item = item
+                                    slot.quantity = quantity
+                                elif slot.item.name == item.name:
+                                    slot.quantity += quantity
+                                placed = True
+                                break
+                    if not placed:
+                        for slot in toolbar.slots:
+                            if slot.is_hovered(mouse_pos):
+                                if slot.item is None:
+                                    slot.item = item
+                                    slot.quantity = quantity
+                                elif slot.item.name == item.name:
+                                    slot.quantity += quantity
+                                placed = True
+                                break
+                    if not placed:
+                        # Nếu không thả được vào slot nào → trả lại chỗ cũ
+                        from_slot.item = item
+                        from_slot.quantity = quantity
+
+                    dragging_item = None
         
         pygame.display.update()
         clock.tick(60)

@@ -339,7 +339,7 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock):
                 sys.exit()
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                # print(mouse_pos)
+                print(mouse_pos)
                 if event.button == 3 :
                     start_pos = mouse_pos
                     selecting = True

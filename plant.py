@@ -20,6 +20,8 @@ class Plant:
         self.index = index
         self.indexob = indexob
 
+
+
     def update(self, delta_time):
         """Cập nhật trạng thái phát triển của cây"""
         if self.time_passed < self.growth_time:
@@ -28,9 +30,11 @@ class Plant:
             stage = int(self.time_passed / (self.growth_time / len(self.growth_stages)))
             self.current_stage = min(stage, len(self.growth_stages) - 1)
 
+
     def draw(self, screen):
         """Vẽ cây lên màn hình"""
         screen.blit(self.images[self.current_stage], (self.x, self.y))
+
 
     def is_ready_to_harvest(self):
         """Kiểm tra xem cây đã ở giai đoạn cuối cùng chưa"""
@@ -38,7 +42,7 @@ class Plant:
     def harvest(self):
         """Trả về item thu hoạch nếu cây sẵn sàng"""
         if self.is_ready_to_harvest():
-            return Item(self.name,self.indexob, self.x + random.randint(-20, 20), self.y + random.randint(-20, 20))  # Item được định nghĩa bên ngoài
+            return Item(self.name,self.indexob, self.x + random.randint(-5, 5), self.y + random.randint(-5, 5))  # Item được định nghĩa bên ngoài
         return None
 class Field:
     def __init__(self, x1, y1, x2, y2, num_columns, num_rows):
