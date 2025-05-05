@@ -14,8 +14,6 @@
  <tileset firstgid="677" source="Beach_Tile.tsx"/>
  <tileset firstgid="692" source="Water_Middle.tsx"/>
  <tileset firstgid="693" source="Tree-3-4.tsx"/>
- <tileset firstgid="697" source="farm bridges.tsx"/>
- <tileset firstgid="889" source="Big-wooden-fence-3.tsx"/>
  <tileset firstgid="892" source="FarmLand_Tile.tsx"/>
  <layer id="5" name="ground" width="120" height="64">
   <data encoding="csv">
