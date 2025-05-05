@@ -15,7 +15,7 @@ from animal import Animal
 from calculateScore import calculate_score, save_score
 from tiles import TileMap
 from GUI import ImageButton
-from items import Slot,Inventory
+from items import Slot,Inventory,HarvestNotification
 import chess
 # Global constants
 CARD_WIDTH, CARD_HEIGHT = 200, 300
@@ -28,12 +28,12 @@ toolbar_x = (1900 - toolbar_width) // 2
 toolbar_y = 1000 - toolbar_height
 inventory_x = toolbar_x
 inventory_y = toolbar_y - 460
-toolbar_slots = []
+# toolbar_slots = []
+# inventory = []
+# Vị trí để đặt ảnh thanh công cụ ở giữa dưới
 yard = []
 merchant_buttons = []
 animals_on_field = []
-feed_bar_slots = [None] * 9
-food_inventory = []
 selected_card = [False, False, False, False, False]
 player = Player()
 
@@ -44,23 +44,9 @@ shelf_positions = [
     (946, 534,1245, 686),# Shelf 4
 
 ]
-raw_positions = [
-    ((578, 903), (645, 966)),
-    ((655, 904), (719, 966)),
-    ((729, 906), (792, 968)),
-    ((804, 905), (868, 966)),
-    ((880, 903), (941, 966)),
-    ((955, 903), (1019, 965)),
-    ((1031, 904), (1094, 963)),
-    ((1105, 905), (1171, 969)),
-    ((1178, 901), (1246, 970)),
-    ((1259, 906), (1322, 970))
-]
 
-slot_positions = [Slot(topleft, bottomright) for topleft, bottomright in raw_positions]
-inventory = Inventory(slot_positions)
 
-def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock):
+def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,slot_positions,inventory_position,toolbar,inventory):
     """
     Main gameplay loop where the game is played.
     Handles rendering, interaction logic, card drawing, animal display, and UI interactions.
@@ -72,6 +58,7 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock):
     #         # Cho phép mua
     #     else:
     #         print("Bạn thua! Không được mua!")
+    dragging_item = None
     show_inventory = False
     show_feed_ui = False
     clock = pygame.time.Clock()
@@ -232,9 +219,7 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock):
         for slot in slot_positions:
             slot.draw(SCREEN,FONT)
 
-        if show_inventory:
-            # print("yes")
-            SCREEN.blit(inventory_image, (inventory_x, inventory_y))
+
 
         # Buttons rendering
         for btn in [back_btn, next_day_btn, roll_btn, play_btn, toggle_card_btn,farm_btn,see_inventory_btn]:
@@ -330,6 +315,21 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock):
             width = abs(x1 - x2)
             height = abs(y1 - y2)
             pygame.draw.rect(SCREEN, (0, 255, 0), (left, top, width, height), 2)
+        if show_inventory: 
+            SCREEN.blit(inventory_image, (inventory_x, inventory_y))
+            for slot in inventory_position:
+                slot.draw(SCREEN,FONT)
+        # Vẽ ảnh thanh công cụ
+        SCREEN.blit(toolbar_image, (toolbar_x, toolbar_y))
+        #slot_toolbar
+        for slot in slot_positions:
+            slot.draw(SCREEN,FONT)
+        if dragging_item:
+            _, dragging_image, dragging_quantity = dragging_item
+            if dragging_image:
+                item_rect = dragging_image.image.get_rect(center=mouse_pos)
+                SCREEN.blit(dragging_image.image, item_rect.topleft)
+    
         if show_score_summary:
             confirm_btn.draw(SCREEN, mouse_pos)
 
@@ -339,7 +339,6 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock):
                 sys.exit()
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                print(mouse_pos)
                 if event.button == 3 :
                     start_pos = mouse_pos
                     selecting = True
@@ -415,34 +414,78 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock):
                     rolls_left -= 1
                 if see_inventory_btn.is_clicked(event):
                     show_inventory = not show_inventory
+                if event.button == 1:  # Chuột trái
+                    if show_inventory:
+                        for slot in inventory.slots:
+                            if slot.is_hovered(mouse_pos) and slot.item:
+                                dragging_item = (slot, slot.item, slot.quantity)
+                                slot.clear()
+                                break
+                    if not dragging_item:
+                        for slot in toolbar.slots:
+                            if slot.is_hovered(mouse_pos) and slot.item:
+                                dragging_item = (slot, slot.item, slot.quantity)
+                                slot.clear()
+                                break
                 if farm_btn.is_clicked(event):
             
                     return "go_to_farming", player, current_day
             elif event.type == pygame.MOUSEMOTION:
                 if selecting:
                     current_pos = mouse_pos
-            elif event.type == pygame.MOUSEBUTTONUP and event.button == 3:
-                selecting = False
-                end_pos = mouse_pos
-                current_pos = (-1,-1)
-                # Tính vùng chọn
-                x1, y1 = start_pos
-                x2, y2 = end_pos
-                left = min(x1, x2)
-                top = min(y1, y2)
-                width = abs(x1 - x2)
-                height = abs(y1 - y2)
-                selection_rect = pygame.Rect(left, top, width, height)
+            elif event.type == pygame.MOUSEBUTTONUP:
+                if event.button == 3:
+                    selecting = False
+                    end_pos = mouse_pos
+                    current_pos = (-1,-1)
+                    # Tính vùng chọn
+                    x1, y1 = start_pos
+                    x2, y2 = end_pos
+                    left = min(x1, x2)
+                    top = min(y1, y2)
+                    width = abs(x1 - x2)
+                    height = abs(y1 - y2)
+                    selection_rect = pygame.Rect(left, top, width, height)
 
-                # Kiểm tra vật phẩm nào nằm trong vùng
-                collected_items = []
-                for item in yard:
-                    if selection_rect.colliderect(item.rect):
-                        inventory.add_item(item)  # Thêm vào kho
-                        collected_items.append(item)
+                    # Kiểm tra vật phẩm nào nằm trong vùng
+                    collected_items = []
+                    for item in yard:
+                        if selection_rect.colliderect(item.rect):
+                            if not inventory.add_item(item):  # nếu inventory đầy
+                                inventory.add_item(item)
+                            collected_items.append(item)
 
-                # Xóa các item đã thu thập khỏi yard
-                for item in collected_items:
-                    yard.remove(item)      
+                    # Xóa các item đã thu thập khỏi yard
+                    for item in collected_items:
+                        yard.remove(item)      
+                if event.button == 1 and dragging_item:
+                    from_slot, item, quantity = dragging_item
+                    placed = False
+                    if show_inventory:
+                        for slot in inventory.slots:
+                            if slot.is_hovered(mouse_pos):
+                                if slot.item is None:
+                                    slot.item = item
+                                    slot.quantity = quantity
+                                elif slot.item.name == item.name:
+                                    slot.quantity += quantity
+                                placed = True
+                                break
+                    if not placed:
+                        for slot in toolbar.slots:
+                            if slot.is_hovered(mouse_pos):
+                                if slot.item is None:
+                                    slot.item = item
+                                    slot.quantity = quantity
+                                elif slot.item.name == item.name:
+                                    slot.quantity += quantity
+                                placed = True
+                                break
+                    if not placed:
+                        # Nếu không thả được vào slot nào → trả lại chỗ cũ
+                        from_slot.item = item
+                        from_slot.quantity = quantity
+
+                    dragging_item = None
         pygame.display.update()
         clock.tick(60)

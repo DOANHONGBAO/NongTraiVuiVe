@@ -5,6 +5,7 @@ from GUI import ImageButton
 from plant import Plant,Field
 import random
 from items import Slot,Inventory,HarvestNotification
+
 def create_plants():
     # Hình ảnh các giai đoạn phát triển của các loại cây
     carrot_images = [pygame.image.load(f"assets/plants/carrot/carrot{i}.png").convert_alpha() for i in range(4)]
@@ -18,12 +19,20 @@ def create_plants():
         Plant(name="Corn", x=0, y=0, growth_stages=[0, 1, 2, 3], growth_time=10000, images=corn_images,indexob = 7),
         Plant(name="Straw_berry", x=0, y=0, growth_stages=[0, 1, 2, 3], growth_time=10000, images=straw_berry_images, indexob = 4),
         Plant(name="Carbage", x=0, y=0, growth_stages=[0, 1, 2, 3], growth_time=10000, images=carbage_images, indexob = 28),
-        Plant(name="Rice", x=0, y=0, growth_stages=[0, 1, 2, 3], growth_time=10000, images=ric, indexob = 3),
+        Plant(name="Rice", x=0, y=0, growth_stages=[0, 1, 2, 3], growth_time=10000, images=rice_images, indexob = 3),
     ]
     
     return plants
 
-
+toolbar_width = 800
+toolbar_height = 126
+# Vị trí để đặt ảnh thanh công cụ ở giữa dưới
+toolbar_x = (1900 - toolbar_width) // 2
+toolbar_y = 1000 - toolbar_height
+inventory_x = toolbar_x
+inventory_y = toolbar_y - 460
+# toolbar_slots = []
+# inventory = []
 yard = []
 
 # Tạo các thửa ruộng
@@ -61,52 +70,9 @@ fields = [
     Field(1123,645, 1279,797, 4, 4), # field24
 ]
 
-toolbar_width = 800
-toolbar_height = 126
-# Vị trí để đặt ảnh thanh công cụ ở giữa dưới
-toolbar_x = (1900 - toolbar_width) // 2
-toolbar_y = 1000 - toolbar_height
-inventory_x = toolbar_x
-inventory_y = toolbar_y - 460
-toolbar_slots = []
-raw_positions = [
-    ((578, 903), (645, 966)),
-    ((655, 904), (719, 966)),
-    ((729, 906), (792, 968)),
-    ((804, 905), (868, 966)),
-    ((880, 903), (941, 966)),
-    ((955, 903), (1019, 965)),
-    ((1031, 904), (1094, 963)),
-    ((1105, 905), (1171, 969)),
-    ((1178, 901), (1246, 970)),
-    ((1259, 906), (1322, 970))
-]
-
-raw_inventory_position = [
-    ((578, 444), (652, 516)), ((652, 444), (726, 516)), ((726, 444), (800, 516)), ((800, 444), (874, 516)), ((874, 444), (948, 516)),
-    ((948, 444), (1022, 516)), ((1022, 444), (1096, 516)), ((1096, 444), (1170, 516)), ((1170, 444), (1244, 516)), ((1244, 444), (1318, 516)),
-
-    ((578, 516), (652, 588)), ((652, 516), (726, 588)), ((726, 516), (800, 588)), ((800, 516), (874, 588)), ((874, 516), (948, 588)),
-    ((948, 516), (1022, 588)), ((1022, 516), (1096, 588)), ((1096, 516), (1170, 588)), ((1170, 516), (1244, 588)), ((1244, 516), (1318, 588)),
-
-    ((578, 588), (652, 660)), ((652, 588), (726, 660)), ((726, 588), (800, 660)), ((800, 588), (874, 660)), ((874, 588), (948, 660)),
-    ((948, 588), (1022, 660)), ((1022, 588), (1096, 660)), ((1096, 588), (1170, 660)), ((1170, 588), (1244, 660)), ((1244, 588), (1318, 660)),
-
-    ((578, 660), (652, 734)), ((652, 660), (726, 734)), ((726, 660), (800, 734)), ((800, 660), (874, 734)), ((874, 660), (948, 734)),
-    ((948, 660), (1022, 734)), ((1022, 660), (1096, 734)), ((1096, 660), (1170, 734)), ((1170, 660), (1244, 734)), ((1244, 660), (1318, 734)),
-
-    ((578, 734), (652, 808)), ((652, 734), (726, 808)), ((726, 734), (800, 808)), ((800, 734), (874, 808)), ((874, 734), (948, 808)),
-    ((948, 734), (1022, 808)), ((1022, 734), (1096, 808)), ((1096, 734), (1170, 808)), ((1170, 734), (1244, 808)), ((1244, 734), (1318, 808)),
-]
 
 
-inventory_position = [Slot(topleft,bottomright) for topleft,bottomright in raw_inventory_position] 
-inventory = Inventory(inventory_position)
-
-slot_positions = [Slot(topleft, bottomright) for topleft, bottomright in raw_positions]
-toolbar = Inventory(slot_positions)
-
-def farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, current_day,clock):
+def farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, current_day,clock,slot_positions,inventory_position,toolbar,inventory):
     BUTTON_WIDTH, BUTTON_HEIGHT = 300, 90
     plants = create_plants()
     harvest_notifications = []
@@ -145,7 +111,7 @@ def farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, curren
     tmx_data = pytmx.load_pygame("assets/tiles/background_farm.tmx")
     inventory_image = pygame.image.load("assets/images/inventory.png").convert_alpha()
     
-    selected_plant = plants[3]  # Biến lưu cây được chọn để trồng
+    selected_plant = []  # Biến lưu cây được chọn để trồng
 
     while True:
         mouse_pos = pygame.mouse.get_pos()

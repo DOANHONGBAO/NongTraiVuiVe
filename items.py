@@ -139,8 +139,8 @@ class HarvestNotification:
         self.noti_image = pygame.image.load("assets/images/noti.png").convert_alpha()
         self.item_image = item_image
         self.timer = 2.0  # hiện 2 giây
-        self.x = 960  # giữa màn hình (1920/2)
-        self.y = 100
+        self.x = 0  # giữa màn hình (1920/2)
+        self.y = 0
 
     def update(self, delta_time):
         self.timer -= delta_time

@@ -4,6 +4,8 @@ from menu import start_screen
 from gameplay import gameplay_screen
 from farming_screen import farming_screen 
 from audio import start_background_music, stop_music
+from items import Slot,Inventory,HarvestNotification
+from login import login_screen
 pygame.init()
 WIDTH, HEIGHT = 1915, 1020 
 SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -28,9 +30,11 @@ BIG_FONT = pygame.font.Font("assets/fonts/arcade-among-1.otf", 36)
 
 # Các trạng thái của game
 STATE_MENU = "menu"
+STATE_LOGIN = "login"
 STATE_GAMEPLAY = "gameplay"
 STATE_FARMING = "farming"
 current_state = STATE_MENU
+current_user = None
 player = None
 current_day = 1
 
@@ -92,7 +96,25 @@ def main():
                 stop_music()
                 pygame.quit()
                 sys.exit()
-
+        # if current_state == STATE_MENU:
+        #     play_clicked = start_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, clock)
+        #     if play_clicked:
+        #         current_state = STATE_LOGIN
+        
+        # elif current_state == STATE_LOGIN:
+        #     status, player_data = login_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, clock)
+        #     if status == "quit":
+        #         pygame.quit()
+        #         sys.exit()
+        #     else:
+        #         current_day = player_data['current_day']
+        #         # Nếu inventory trong data, load; nếu không, để inventory cũ
+        #         inventory_data = player_data.get('inventory', [])
+        #         # TODO: load inventory items thực sự từ danh sách tên → đối tượng game (bạn cần xử lý thêm)
+        #         current_state = STATE_GAMEPLAY
+        
+        # elif current_state == STATE_GAMEPLAY:
+        #     result = gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, clock, slot_positions, inventory_position, toolbar, inventory)
         # Gọi hàm xử lý tương ứng với từng trạng thái
         if current_state == STATE_MENU:
             mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -101,7 +123,7 @@ def main():
                 current_state = STATE_GAMEPLAY
 
         elif current_state == STATE_GAMEPLAY:
-            result = gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,toolbar,inventory)
+            result = gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,slot_positions,inventory_position,toolbar,inventory)
             if isinstance(result, tuple):
                     action, player, current_day = result
                     if action == "go_to_farming":
@@ -111,7 +133,7 @@ def main():
             elif result == "back_to_menu":
                     current_state = STATE_MENU
         elif current_state == STATE_FARMING:
-            result = farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, current_day,clock,toolbar,inventory)
+            result = farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, current_day,clock,slot_positions,inventory_position,toolbar,inventory)
             if result == "back_to_gameplay":
                 current_state = STATE_GAMEPLAY
 
