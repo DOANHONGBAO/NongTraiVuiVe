@@ -1,5 +1,6 @@
 import pygame
 import math
+
 pygame.init()
 
 # Setup màn hình trước
@@ -29,8 +30,6 @@ class Item:
         self.offset_y = 0  # độ lệch khi nảy
 
     def update(self):
-
-
         if self.bouncing:
             self.offset_y += self.bounce_velocity
             self.bounce_velocity += self.gravity
@@ -46,7 +45,6 @@ class Item:
             # Nhấp nhô nhẹ: sin time
             self.float_timer += 0.05
             self.float_offset = math.sin(self.float_timer) * 5  # +-5 pixels
-
 
     def draw(self, screen):
         # Xoay hình item
@@ -66,7 +64,6 @@ class Item:
             screen.blit(shadow_surface, shadow_rect.topleft)
             screen.blit(rotated_image, rotated_rect.topleft)
 
-
 class Slot:
     def __init__(self, topleft, bottomright):
         x, y = topleft
@@ -75,6 +72,7 @@ class Slot:
         self.rect = pygame.Rect(x, y, w, h)
         self.item = None  # Item object
         self.quantity = 0  # Số lượng item trong ô
+        self.selected = False
 
     def add_item(self, item, amount=1):
         if self.item is None:
@@ -109,6 +107,8 @@ class Slot:
                 quantity_text = font.render(str(self.quantity), True, (0, 0, 0))
                 quantity_rect = quantity_text.get_rect(bottomright=(self.rect.right - 5, self.rect.bottom - 5))
                 screen.blit(quantity_text, quantity_rect.topleft)
+        if self.selected:
+            pygame.draw.rect(screen, (255, 255, 0), self.rect, 3)
 
     def is_hovered(self, mouse_pos):
         return self.rect.collidepoint(mouse_pos)
@@ -134,6 +134,7 @@ class Inventory:
             if slot.item is None:
                 slot.add_item(item)
                 return
+
 class HarvestNotification:
     def __init__(self, item_image):
         self.noti_image = pygame.image.load("assets/images/noti.png").convert_alpha()

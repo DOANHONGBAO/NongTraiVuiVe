@@ -1,5 +1,7 @@
 import random
 from animal import Animal
+from items import Item
+
 # from food import Food
 
 class Merchant:
@@ -9,36 +11,24 @@ class Merchant:
     def generate_items(self):
         items = []
         for _ in range(3):  # Hiển thị 3 món mỗi lần
-            if random.random() < 1:
+            if random.random() < 0.3:
                 # Tạo động vật với vị trí ngẫu nhiên
                 animal = random.choice([
-                    Animal(name="Bò", cost=25, x=random.randint(100, 600), y=random.randint(400, 500)),
-                    Animal(name="Gà", cost=15, x=random.randint(100, 600), y=random.randint(400, 500)),
-                    Animal(name="Heo", cost=20, x=random.randint(100, 600), y=random.randint(400, 500)),
-                    Animal(name="Cừu", cost=22, x=random.randint(100, 600), y=random.randint(400, 500)),
-                    Animal(name="Dê", cost=22, x=random.randint(100, 600), y=random.randint(400, 500)),
-                    # Animal(name="Ngựa", cost=30, x=random.randint(100, 600), y=random.randint(400, 500)),
-                    # Animal(name="Vịt", cost=12, x=random.randint(100, 600), y=random.randint(400, 500)),
-                    # Animal(name="Thỏ", cost=10, x=random.randint(100, 600), y=random.randint(400, 500)),
-                    # Animal(name="Chó", cost=18, x=random.randint(100, 600), y=random.randint(400, 500)),
+                    Animal(name="Bò", cost=25, index = 0, x=random.randint(100, 600), y=random.randint(400, 500)),
+                    Animal(name="Gà", cost=15, index = 0, x=random.randint(100, 600), y=random.randint(400, 500)),
+                    Animal(name="Heo", cost=20, index = 0, x=random.randint(100, 600), y=random.randint(400, 500)),
+                    Animal(name="Cừu", cost=22, index = 0, x=random.randint(100, 600), y=random.randint(400, 500)),
+                    Animal(name="Dê", cost=22, index = 0, x=random.randint(100, 600), y=random.randint(400, 500)),
                 ])
-                items.append(animal)
-            # else:
-                # # Tạo thực phẩm
-                # food = random.choice([
-                #     Food("Thức ăn gia súc", 10),
-                #     Food("Cỏ khô", 5),
-                #     # Food("Ngũ cốc", 8),
-                #     # Food("Thức ăn hỗn hợp", 12),
-                #     # Food("Bắp", 7),
-                #     # Food("Rơm", 6),
-                #     # Food("Thức ăn cao cấp", 15),
-                #     # Food("Cá khô", 10),
-                #     # Food("Hoa quả tươi", 18),
-                #     # Food("Bánh mì", 9),
-                #     # Food("Sữa tươi", 12),
-                #     # Food("Khoai tây", 5),
-                #     # Food("Hạt giống", 4),
-                # ])
-                # items.append(food)
+            else:
+                # Bán hạt giống
+                seed = random.choice([
+                    Item(name="Carrot", index=2, x=0, y=0),
+                    Item(name="Corn", index=7, x=0, y=0),
+                    Item(name="Straw_berry", index=4, x=0, y=0),
+                    Item(name="Carbage", index=28, x=0, y=0),
+                    Item(name="Rice", index=3, x=0, y=0),
+                ])
+                seed.cost = 10  # thêm thuộc tính cost để mua
+                items.append(seed)
         return items

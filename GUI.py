@@ -29,8 +29,8 @@ class ImageButton:
         surface.blit(image, self.rect.topleft)
 
         # Vẽ viền sáng nếu hover
-        if self.hovered:
-            pygame.draw.rect(surface, self.border_color, self.rect, self.border_thickness)
+        # if self.hovered:
+        #     pygame.draw.rect(surface, self.border_color, self.rect, self.border_thickness)
 
         # Vẽ văn bản
         if self.text:

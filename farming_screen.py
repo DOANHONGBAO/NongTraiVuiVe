@@ -72,7 +72,7 @@ fields = [
 
 
 
-def farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, current_day,clock,slot_positions,inventory_position,toolbar,inventory):
+def farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, current_day, clock):
     BUTTON_WIDTH, BUTTON_HEIGHT = 300, 90
     plants = create_plants()
     harvest_notifications = []
@@ -85,19 +85,23 @@ def farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, curren
     dragging_item = None
     # Load hình ảnh nút
     toolbar_image = pygame.image.load("assets/images/toolbar.png").convert_alpha()
-    image_normal = pygame.image.load("assets/GUI/ButtonsText/ButtonText_Large_GreyOutline_Round.png").convert_alpha()
-    image_hover = pygame.image.load("assets/GUI/ButtonsText/ButtonText_Large_Orange_Round.png").convert_alpha()
+    image_normal = pygame.image.load("assets//GUI/ButtonsIcons/IconButton_Large_Circle.png").convert_alpha()
+    image_hover = pygame.image.load("assets/GUI/ButtonsIcons/IconButton_Large_GreyOutline_Circle.png").convert_alpha()
     image_btn_see_inventory = pygame.image.load("assets/GUI/ButtonsIcons/IconButton_Large_Circle.png").convert_alpha()
     image_see_inventory_hover = pygame.image.load("assets/GUI/ButtonsIcons/IconButton_Large_GreyOutline_Circle.png").convert_alpha()
-
+    image_triangle = pygame.image.load("assets/GUI/Sliders/ScrollSlider_Arrow.png").convert_alpha()
+    image_triangle = pygame.transform.rotate(image_triangle, 180)
+    image_triangle = pygame.transform.scale(image_triangle, (60, 60))
+    image_triangle_hover = pygame.image.load("assets/GUI/Sliders/ScrollSlider_Blank_Arrow.png").convert_alpha()
+    image_triangle_hover = pygame.transform.rotate(image_triangle_hover, 180)
+    image_triangle_hover = pygame.transform.scale(image_triangle_hover, (60, 60))
     # Tạo nút quay lại bằng ImageButton có hiệu ứng hover
     back_btn = ImageButton(
-        WIDTH - BUTTON_WIDTH - 30, HEIGHT // 2 - 50,
-        BUTTON_WIDTH, BUTTON_HEIGHT,
-        "Quay lại Game", FONT,
+        WIDTH - 70, HEIGHT // 2 - 50,
+        60, 60,
+        "", FONT,
         (255, 255, 255),  # màu chữ thường
-        image_normal, image_hover,
-        hover_text_color=(255, 255, 0)  # màu chữ hover
+        image_triangle, image_triangle_hover
     )
     see_inventory_btn = ImageButton(
         1370, 883, 100, 100,
@@ -110,9 +114,8 @@ def farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, curren
     # Load bản đồ TMX
     tmx_data = pytmx.load_pygame("assets/tiles/background_farm.tmx")
     inventory_image = pygame.image.load("assets/images/inventory.png").convert_alpha()
-    
-    selected_plant = []  # Biến lưu cây được chọn để trồng
-
+    # Biến lưu cây được chọn để trồng
+    selected_plant = []
     while True:
         mouse_pos = pygame.mouse.get_pos()
         SCREEN.fill(COLORS["LIGHT_GREEN"])
@@ -126,19 +129,19 @@ def farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, curren
                         SCREEN.blit(tile_image, (x * tmx_data.tilewidth, y * tmx_data.tileheight))
 
         # ===== VẼ GIAO DIỆN =====
-        title_text = BIG_FONT.render("Khu Trồng Trọt", True, COLORS["BROWN"])
-        SCREEN.blit(title_text, (WIDTH // 2 - 150, 50))
 
         gold_text = FONT.render(f"Vàng: {player.gold}", True, COLORS["YELLOW"])
         SCREEN.blit(gold_text, (30, 150))
-
-        farm_text = FONT.render(f"Động vật: {len(player.animals)} | Thức ăn: {len(player.food)}", True, COLORS["BLACK"])
-        SCREEN.blit(farm_text, (30, 200))
-
-        day_text = FONT.render(f"Ngày: {current_day}", True, COLORS["BLACK"])
-        SCREEN.blit(day_text, (30, 250))
-
-
+        selected_toolbar_index = 0  # Mặc định chọn ô đầu tiên
+        if player.toolbar.slots:
+            slot = player.toolbar.slots[selected_toolbar_index]
+            slot.selected = True
+            if slot.item and slot.item.name in ["Carrot", "Corn", "Straw_berry", "Carbage", "Rice"]:
+                for p in plants:
+                    if p.name == slot.item.name:
+                        selected_plant.clear()
+                        selected_plant.append(p)
+                        break
         # Vẽ các cây đã trồng trong các thửa ruộng
         for field in fields:
             if field.plants:
@@ -187,12 +190,12 @@ def farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, curren
             btn.draw(SCREEN, mouse_pos)
         if show_inventory: 
             SCREEN.blit(inventory_image, (inventory_x, inventory_y))
-            for slot in inventory_position:
+            for slot in player.inventory_position:
                 slot.draw(SCREEN,FONT)
         # Vẽ ảnh thanh công cụ
         SCREEN.blit(toolbar_image, (toolbar_x, toolbar_y))
         #slot_toolbar
-        for slot in slot_positions:
+        for slot in player.slot_positions:
             slot.draw(SCREEN,FONT)
         if dragging_item:
             _, dragging_image, dragging_quantity = dragging_item
@@ -213,26 +216,27 @@ def farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, curren
                     selecting = True
                 #Giả sử bạn có object `selected_plant` để trồng lại
                 if not show_inventory : 
-                    for field in fields:
-                        if field.is_clicked(mouse_pos) and event.button == 1:
-                            field.plant_crops(selected_plant, selected_plant.images)
-                            dropped = field.try_harvest()
-                            yard.extend(dropped)
+                    if selected_plant:
+                        for field in fields:
+                            if field.is_clicked(mouse_pos) and event.button == 1:
+                                field.plant_crops(selected_plant[0], selected_plant[0].images)
+                                dropped = field.try_harvest()
+                                yard.extend(dropped)
                 if see_inventory_btn.is_clicked(event):
                     show_inventory = not show_inventory
                 if event.button == 1:  # Chuột trái
                     if show_inventory:
-                        for slot in inventory.slots:
+                        for slot in player.inventory.slots:
                             if slot.is_hovered(mouse_pos) and slot.item:
                                 dragging_item = (slot, slot.item, slot.quantity)
                                 slot.clear()
                                 break
-                    if not dragging_item:
-                        for slot in toolbar.slots:
-                            if slot.is_hovered(mouse_pos) and slot.item:
-                                dragging_item = (slot, slot.item, slot.quantity)
-                                slot.clear()
-                                break
+                if not dragging_item:
+                    for slot in player.toolbar.slots:
+                        if slot.is_hovered(mouse_pos) and slot.item:
+                            dragging_item = (slot, slot.item, slot.quantity)
+                            slot.clear()
+                            break
                 # Kiểm tra nếu click vào nút "Quay lại Game"
                 if back_btn.is_clicked(event):  # ✅ Sửa lỗi truyền tuple
                     return "back_to_gameplay"
@@ -257,8 +261,8 @@ def farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, curren
                     collected_items = []
                     for item in yard:
                         if selection_rect.colliderect(item.rect):
-                            if not inventory.add_item(item):  # nếu inventory đầy
-                                inventory.add_item(item)
+                            if not player.inventory.add_item(item):  # nếu inventory đầy
+                                player.inventory.add_item(item)
                             collected_items.append(item)
 
                     # Xóa các item đã thu thập khỏi yard
@@ -268,7 +272,7 @@ def farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, curren
                     from_slot, item, quantity = dragging_item
                     placed = False
                     if show_inventory:
-                        for slot in inventory.slots:
+                        for slot in player.inventory.slots:
                             if slot.is_hovered(mouse_pos):
                                 if slot.item is None:
                                     slot.item = item
@@ -278,7 +282,7 @@ def farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, curren
                                 placed = True
                                 break
                     if not placed:
-                        for slot in toolbar.slots:
+                        for slot in player.toolbar.slots:
                             if slot.is_hovered(mouse_pos):
                                 if slot.item is None:
                                     slot.item = item

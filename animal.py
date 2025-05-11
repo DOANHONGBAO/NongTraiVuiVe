@@ -32,13 +32,14 @@ class Animal:
         },
     }
 
-    def __init__(self, name, cost, x=0, y=0, screen_width=1900, screen_height=1000):
+    def __init__(self, name, cost, index, x=0, y=0, screen_width=1900, screen_height=1000):
         self.name = name
         self.cost = cost
         self.hungry = True
 
         self.screen_width = screen_width
         self.screen_height = screen_height
+        self.index = index
 
         TRANSLATE_NAMES = {
             "Gà": "chicken",

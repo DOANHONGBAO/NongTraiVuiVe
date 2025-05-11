@@ -12,11 +12,11 @@ import random
 from player import Player
 from merchant import Merchant
 from animal import Animal
-from calculateScore import calculate_score, save_score
+# from calculateScore import calculate_score, save_score
 from tiles import TileMap
 from GUI import ImageButton
-from items import Slot,Inventory,HarvestNotification
-import chess
+from items import Slot,Inventory,HarvestNotification,Item
+# from main import save_player_data
 # Global constants
 CARD_WIDTH, CARD_HEIGHT = 200, 300
 ITEM_WIDTH, ITEM_HEIGHT = 30, 45
@@ -33,7 +33,6 @@ inventory_y = toolbar_y - 460
 # Vị trí để đặt ảnh thanh công cụ ở giữa dưới
 yard = []
 merchant_buttons = []
-animals_on_field = []
 selected_card = [False, False, False, False, False]
 player = Player()
 
@@ -46,18 +45,11 @@ shelf_positions = [
 ]
 
 
-def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,slot_positions,inventory_position,toolbar,inventory):
+def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,player):
     """
     Main gameplay loop where the game is played.
     Handles rendering, interaction logic, card drawing, animal display, and UI interactions.
     """
-    # def mua_vat_pham():
-    #     print("Muốn mua vật phẩm? Phải đánh thắng người bán trước!")
-    #     if chess.start_chess_battle_overlay(SCREEN):
-    #         print("Bạn thắng! Mua thành công!")
-    #         # Cho phép mua
-    #     else:
-    #         print("Bạn thua! Không được mua!")
     dragging_item = None
     show_inventory = False
     show_feed_ui = False
@@ -90,13 +82,14 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,slot_pos
     pot_image = pygame.image.load("assets/images/pot.png").convert_alpha()
     pot_image = pygame.transform.scale(pot_image, (223, 181))  # nếu chưa đúng kích thước thì resize lại
     # Tải hình ảnh nút
-    image_normal = pygame.image.load("assets/GUI/ButtonsText/ButtonText_Large_GreyOutline_Round.png").convert_alpha()
-    image_hover = pygame.image.load("assets/GUI/ButtonsText/ButtonText_Large_Orange_Round.png").convert_alpha()
+    image_normal = pygame.image.load("assets/GUI/ButtonsIcons/IconButton_Large_Circle.png").convert_alpha()
+    image_hover = pygame.image.load("assets/GUI/ButtonsIcons/IconButton_Large_GreyOutline_Circle.png").convert_alpha()
 
     # Tải hình tam giác
     image_triangle = pygame.image.load("assets/GUI/Sliders/ScrollSlider_Arrow.png").convert_alpha()
-    image_triangle = pygame.transform.rotate(image_triangle, 180)
     image_triangle = pygame.transform.scale(image_triangle, (60, 60))
+    image_triangle_hover = pygame.image.load("assets/GUI/Sliders/ScrollSlider_Blank_Arrow.png").convert_alpha()
+    image_triangle_hover = pygame.transform.scale(image_triangle_hover, (60, 60))
     image_btn_see_inventory = pygame.image.load("assets/GUI/ButtonsIcons/IconButton_Large_Circle.png").convert_alpha()
     image_see_inventory_hover = pygame.image.load("assets/GUI/ButtonsIcons/IconButton_Large_GreyOutline_Circle.png").convert_alpha()
     #Tải hình ảnh quay lại
@@ -149,7 +142,7 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,slot_pos
         "", FONT,  # không có text
         (0, 0, 0),
         image_triangle,
-        image_triangle  # có thể dùng cùng một hình cho hover nếu không có ảnh riêng
+        image_triangle_hover  # có thể dùng cùng một hình cho hover nếu không có ảnh riêng
     )
 
     see_inventory_btn = ImageButton(
@@ -190,7 +183,6 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,slot_pos
             selected_card[i] = False
 
     draw_cards()
-
     while True:
         mouse_pos = pygame.mouse.get_pos()
         SCREEN.fill(COLORS["GREEN"])
@@ -204,11 +196,9 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,slot_pos
 
         # UI Text
         SCREEN.blit(BIG_FONT.render(f"Vàng: {player.gold}", True, COLORS["YELLOW"]), (30, 30))
-        SCREEN.blit(BIG_FONT.render(f"Ngày {current_day}", True, COLORS["BLACK"]), (30, 100))
-        SCREEN.blit(FONT.render(f"Lượt roll còn lại: {rolls_left}", True, COLORS["BLACK"]), (30, 220))
 
         # Animal drawing
-        for animal in animals_on_field:
+        for animal in player.animals_on_field:
             animal.update()
             animal.draw(SCREEN)
 
@@ -216,7 +206,7 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,slot_pos
         SCREEN.blit(toolbar_image, (toolbar_x, toolbar_y))
 
         #slot_toolbar
-        for slot in slot_positions:
+        for slot in player.slot_positions:
             slot.draw(SCREEN,FONT)
 
 
@@ -263,7 +253,9 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,slot_pos
 
                 SCREEN.blit(card_img, rect.topleft)
 
-
+        selected_toolbar_index = 0
+        if player.toolbar.slots:
+            player.toolbar.slots[selected_toolbar_index].selected = True
 
         # ===================== GIAO DIỆN THƯƠNG GIA =====================
         merchant_buttons = []
@@ -317,12 +309,12 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,slot_pos
             pygame.draw.rect(SCREEN, (0, 255, 0), (left, top, width, height), 2)
         if show_inventory: 
             SCREEN.blit(inventory_image, (inventory_x, inventory_y))
-            for slot in inventory_position:
+            for slot in player.inventory_position:
                 slot.draw(SCREEN,FONT)
         # Vẽ ảnh thanh công cụ
         SCREEN.blit(toolbar_image, (toolbar_x, toolbar_y))
         #slot_toolbar
-        for slot in slot_positions:
+        for slot in player.slot_positions:
             slot.draw(SCREEN,FONT)
         if dragging_item:
             _, dragging_image, dragging_quantity = dragging_item
@@ -370,13 +362,11 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,slot_pos
                         # Kiểm tra click vào pot_image
                         if item_box.collidepoint(event.pos) and player.gold >= item.cost:
                             player.gold -= item.cost
-                            # mua_vat_pham()
                             if isinstance(item, Animal):
                                 player.animals.append(item.name)
-                                animals_on_field.append(item)
-                            else:
-                                player.food.append(item.name)
-
+                                player.animals_on_field.append(item)
+                            elif isinstance(item, Item):
+                                player.inventory.add_item(item)  # thêm vào túi đồ
                             merchant.items.remove(item)
                             break
 
@@ -385,7 +375,7 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,slot_pos
 
 
                 if show_score_summary and confirm_btn.is_clicked(event):
-                    return "main_menu"
+                    return "back_to_menu"
 
                 if back_btn.is_clicked(event):
                     show_score_summary = True
@@ -416,13 +406,13 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,slot_pos
                     show_inventory = not show_inventory
                 if event.button == 1:  # Chuột trái
                     if show_inventory:
-                        for slot in inventory.slots:
+                        for slot in player.inventory.slots:
                             if slot.is_hovered(mouse_pos) and slot.item:
                                 dragging_item = (slot, slot.item, slot.quantity)
                                 slot.clear()
                                 break
                     if not dragging_item:
-                        for slot in toolbar.slots:
+                        for slot in player.toolbar.slots:
                             if slot.is_hovered(mouse_pos) and slot.item:
                                 dragging_item = (slot, slot.item, slot.quantity)
                                 slot.clear()
@@ -451,8 +441,8 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,slot_pos
                     collected_items = []
                     for item in yard:
                         if selection_rect.colliderect(item.rect):
-                            if not inventory.add_item(item):  # nếu inventory đầy
-                                inventory.add_item(item)
+                            if not player.inventory.add_item(item):  # nếu inventory đầy
+                               player.inventory.add_item(item)
                             collected_items.append(item)
 
                     # Xóa các item đã thu thập khỏi yard
@@ -462,7 +452,7 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,slot_pos
                     from_slot, item, quantity = dragging_item
                     placed = False
                     if show_inventory:
-                        for slot in inventory.slots:
+                        for slot in player.inventory.slots:
                             if slot.is_hovered(mouse_pos):
                                 if slot.item is None:
                                     slot.item = item
@@ -472,7 +462,7 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,slot_pos
                                 placed = True
                                 break
                     if not placed:
-                        for slot in toolbar.slots:
+                        for slot in player.toolbar.slots:
                             if slot.is_hovered(mouse_pos):
                                 if slot.item is None:
                                     slot.item = item
@@ -487,5 +477,6 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,slot_pos
                         from_slot.quantity = quantity
 
                     dragging_item = None
+
         pygame.display.update()
         clock.tick(60)
