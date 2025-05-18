@@ -11,9 +11,11 @@ from login import login_screen
 from player import Player
 from settings_manager import Settings, settings_screen
 pygame.mixer.init()
-
+icon = pygame.image.load("icon.ico")
+pygame.display.set_icon(icon)
 pygame.init()
-WIDTH, HEIGHT = 1915, 1020
+info = pygame.display.Info()
+WIDTH, HEIGHT = info.current_w, info.current_h
 SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Nông Trại Vui Vẻ")
 
