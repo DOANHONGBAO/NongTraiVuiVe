@@ -65,7 +65,7 @@ class Field:
 
     def plant_crops(self, plant, plant_images):
         if self.plants or self.harvested is False:
-            return  # Không trồng nếu đã có cây hoặc chưa thu hoạch
+            return 0 # Không trồng nếu đã có cây hoặc chưa thu hoạch
         plant_width, plant_height = 32, 32
         x_start = self.rect.x + 10
         y_start = self.rect.y + 10
@@ -81,6 +81,7 @@ class Field:
                                   images=plant_images, index=count,indexob = plant.indexob)
                 self.plants.append(new_plant)
         self.harvested = False  # Đặt lại trạng thái khi trồng
+        return 1
     def update(self, delta_time):
         for plant in self.plants:
             plant.update(delta_time)

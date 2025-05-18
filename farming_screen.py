@@ -15,7 +15,7 @@ def create_plants():
     rice_images = [pygame.image.load(f"assets/plants/rice/rice{i}.png").convert_alpha() for i in range(4)]
     # Tạo các cây
     plants = [
-        Plant(name="Carrot", x=0, y=0, growth_stages=[0, 1, 2, 3], growth_time=300000, images=carrot_images,index = 0,indexob = 2),
+        Plant(name="Carrot", x=0, y=0, growth_stages=[0, 1, 2, 3], growth_time=10000, images=carrot_images,index = 0,indexob = 2),
         Plant(name="Corn", x=0, y=0, growth_stages=[0, 1, 2, 3], growth_time=30000, images=corn_images,indexob = 7),
         Plant(name="Straw_berry", x=0, y=0, growth_stages=[0, 1, 2, 3], growth_time=1500000, images=straw_berry_images, indexob = 4),
         Plant(name="Carbage", x=0, y=0, growth_stages=[0, 1, 2, 3], growth_time=2000000, images=carbage_images, indexob = 28),
@@ -85,9 +85,11 @@ def farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, curren
     dragging_item = None
     selected_toolbar_index = 0  # Mặc định chọn ô đầu tiên
     # Load hình ảnh nút
+    sell_sound = pygame.mixer.Sound("assets/audios/sell.mp3")
     toolbar_image = pygame.image.load("assets/images/toolbar.png").convert_alpha()
     # Tạo nút quay lại bằng ImageButton có hiệu ứng hover
-
+    coin_image = pygame.image.load("assets/images/coin.png").convert_alpha()
+    coin_image = pygame.transform.scale(coin_image, (20, 20))  # Resize vừa phải
     
     # Load bản đồ TMX
     tmx_data = pytmx.load_pygame("assets/tiles/background_farm.tmx")
@@ -105,9 +107,23 @@ def farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, curren
                         SCREEN.blit(tile_image, (x * tmx_data.tilewidth, y * tmx_data.tileheight))
 
         # ===== VẼ GIAO DIỆN =====
+        hud_width, hud_height = 250, 75
+        hud_x = WIDTH - hud_width - 20
+        hud_y = 20
 
-        gold_text = FONT.render(f"Vàng: {player.gold}", True, COLORS["YELLOW"])
-        SCREEN.blit(gold_text, (30, 150))
+        # Nền gỗ nâu trầm
+        pygame.draw.rect(SCREEN, (95, 65, 40), (hud_x, hud_y, hud_width, hud_height), border_radius=8)
+
+        # Viền vàng ánh cam
+        pygame.draw.rect(SCREEN, (255, 200, 80), (hud_x, hud_y, hud_width, hud_height), 3, border_radius=8)
+
+        # Vẽ icon coin
+        SCREEN.blit(coin_image, (hud_x + 10, (hud_y + hud_height) / 2))
+
+        # Vẽ số vàng (vàng sáng, đổ bóng nhẹ)
+        gold_text = FONT.render(": "f'{player.gold}', True, (255, 255, 160))  # Vàng sáng nhẹ
+        SCREEN.blit(gold_text, (hud_x + 40, hud_y + 2))
+
 
         if player.toolbar.slots:
             slot = player.toolbar.slots[selected_toolbar_index]
@@ -198,22 +214,19 @@ def farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, curren
                 #Giả sử bạn có object `selected_plant` để trồng lại
                 if not show_inventory : 
                     if selected_plant != None:
-                        for slot in player.toolbar.slots:
-                            if slot.selected:
-                                temp = slot.item
                         for field in fields:
                             if field.is_clicked(mouse_pos) and event.button == 1:
-                                field.plant_crops(selected_plant, selected_plant.images)
-
-                                # Trồng cây thì giảm 1 đơn vị trong toolbar
-                                slot = player.toolbar.slots[selected_toolbar_index]
-                                if slot.item and slot.quantity > 1:
-                                    slot.quantity -= 1
-                                else:
-                                    slot.clear()
-
-                                dropped = field.try_harvest()
-                                yard.extend(dropped)
+                                if field.plant_crops(selected_plant, selected_plant.images):
+                                    # Trồng cây thì giảm 1 đơn vị trong toolbar
+                                    slot = player.toolbar.slots[selected_toolbar_index]
+                                    if slot.item and slot.quantity > 1:
+                                        slot.quantity -= 1
+                                    else:
+                                        slot.clear()
+                    for field in fields:
+                        if field.is_clicked(mouse_pos) and event.button == 1:
+                            dropped = field.try_harvest()
+                            yard.extend(dropped)
                 if event.button == 1:  # Chuột trái
                     if show_inventory:
                         for slot in player.inventory.slots:
@@ -301,5 +314,13 @@ def farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, curren
                     return "back_to_gameplay"
                 elif event.key == pygame.K_ESCAPE:
                     return "back_to_menu"
+                elif event.key == pygame.K_s:
+                    # Bán item đang được kéo
+                    if dragging_item:
+                        from_slot, item, quantity = dragging_item
+                        sell_price = 5 * quantity * 0.075  # Bán giá nửa giá gốc
+                        player.gold += sell_price
+                        dragging_item = None
+                        sell_sound.play()  # 🔊 Phát âm thanh
         pygame.display.update()
         clock.tick(60)

@@ -5,7 +5,7 @@ from animal import Animal  # Assuming animal.py exists
 
 class Player:
     def __init__(self):
-        self.gold = 5000
+        self.gold = 50
         self.animals = []
         self.food = []
         self.hand = self.draw_cards()

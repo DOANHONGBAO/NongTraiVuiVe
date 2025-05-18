@@ -1,6 +1,7 @@
 import pygame
 import time
 import threading
+import random
 
 # Danh sách đường dẫn nhạc nền
 MUSIC_TRACKS = [
@@ -12,7 +13,7 @@ MUSIC_TRACKS = [
     "assets/audios/music6.mp3",
     "assets/audios/music7.mp3"
 ]
-
+random.shuffle(MUSIC_TRACKS)
 MUSIC_INTERVAL = 300  # 5 phút = 300 giây
 current_track_index = 0
 running = True

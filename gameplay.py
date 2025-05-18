@@ -27,6 +27,7 @@ toolbar_x = (1900 - toolbar_width) // 2
 toolbar_y = 1000 - toolbar_height
 inventory_x = toolbar_x
 inventory_y = toolbar_y - 460
+
 # toolbar_slots = []
 # inventory = []
 # Vị trí để đặt ảnh thanh công cụ ở giữa dưới
@@ -42,7 +43,7 @@ shelf_positions = [
     (946, 534,1245, 686),# Shelf 4
 
 ]
-
+last_merchant_spawn = 0
 
 def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,player):
     """
@@ -108,7 +109,6 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,player):
             selected_card[i] = False
 
     draw_cards()
-    last = 0
     while True:
 
         mouse_pos = pygame.mouse.get_pos()
@@ -120,11 +120,13 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,player):
             merchant = Merchant()
             show_merchant = True
             buy_merchant = False
+        global last_merchant_spawn
         now = pygame.time.get_ticks()
-        if now - last >= 300000:
+        if now - last_merchant_spawn >= 600000:  # 5 phút = 300,000 ms
             merchant = Merchant()
             truck_sound.play()
-            last = now 
+            last_merchant_spawn = now
+            show_merchant = True
 
 
         # Animal drawing
@@ -140,8 +142,8 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,player):
 
 
         # Buttons rendering
-        for btn in [ toggle_card_btn]:
-            btn.draw(SCREEN, mouse_pos)
+        # for btn in [ toggle_card_btn]:
+        #     btn.draw(SCREEN, mouse_pos)
 
 
 
@@ -273,6 +275,10 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,player):
                 sys.exit()
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
+                for animal in player.animals_on_field:
+                    if animal.check_clicked(event.pos):
+                        player.gold += animal.cost * 0.1
+                        break  # chỉ click 1 con/lần
                 # Scroll wheel interaction
                 if event.button == 4:  # Scroll up
                     selected_toolbar_index = (selected_toolbar_index - 1) % len(player.toolbar.slots)
@@ -409,7 +415,7 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,player):
                     # Bán item đang được kéo
                     if dragging_item:
                         from_slot, item, quantity = dragging_item
-                        sell_price = 5 * quantity * 0.75  # Bán giá nửa giá gốc
+                        sell_price = 5 * quantity * 0.075  # Bán giá nửa giá gốc
                         player.gold += sell_price
                         dragging_item = None
                         sell_sound.play()  # 🔊 Phát âm thanh
