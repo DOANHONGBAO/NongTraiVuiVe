@@ -11,7 +11,7 @@ class Merchant:
     def generate_items(self):
         items = []
         for _ in range(3):  # Hiển thị 3 món mỗi lần
-            if random.random() < 0.3:
+            if random.random() < 0.5:
                 # Tạo động vật với vị trí ngẫu nhiên
                 animal = random.choice([
                     Animal(name="Bò", cost=25, index = 0, x=random.randint(100, 600), y=random.randint(400, 500)),
@@ -20,6 +20,7 @@ class Merchant:
                     Animal(name="Cừu", cost=22, index = 0, x=random.randint(100, 600), y=random.randint(400, 500)),
                     Animal(name="Dê", cost=22, index = 0, x=random.randint(100, 600), y=random.randint(400, 500)),
                 ])
+                items.append(animal)
             else:
                 # Bán hạt giống
                 seed = random.choice([

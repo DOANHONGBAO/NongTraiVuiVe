@@ -71,6 +71,7 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,player):
     current_pos = (-1, -1)
     selection_rect = None
     merchant_buttons = []  # Reset mỗi frame
+    selected_toolbar_index = 0
     tilemap = TileMap("assets/tiles/background.tmx")
 
     # Buttons
@@ -205,9 +206,7 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,player):
         # Vẽ ảnh thanh công cụ
         SCREEN.blit(toolbar_image, (toolbar_x, toolbar_y))
 
-        #slot_toolbar
-        for slot in player.slot_positions:
-            slot.draw(SCREEN,FONT)
+
 
 
 
@@ -253,7 +252,7 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,player):
 
                 SCREEN.blit(card_img, rect.topleft)
 
-        selected_toolbar_index = 0
+        # selected_toolbar_index = 0
         if player.toolbar.slots:
             player.toolbar.slots[selected_toolbar_index].selected = True
 
@@ -314,8 +313,9 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,player):
         # Vẽ ảnh thanh công cụ
         SCREEN.blit(toolbar_image, (toolbar_x, toolbar_y))
         #slot_toolbar
-        for slot in player.slot_positions:
-            slot.draw(SCREEN,FONT)
+        for i, slot in enumerate(player.toolbar.slots):
+            slot.selected = (i == selected_toolbar_index)
+            slot.draw(SCREEN, FONT)
         if dragging_item:
             _, dragging_image, dragging_quantity = dragging_item
             if dragging_image:
@@ -331,6 +331,11 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,player):
                 sys.exit()
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
+                # Scroll wheel interaction
+                if event.button == 4:  # Scroll up
+                    selected_toolbar_index = (selected_toolbar_index - 1) % len(player.toolbar.slots)
+                elif event.button == 5:  # Scroll down
+                    selected_toolbar_index = (selected_toolbar_index + 1) % len(player.toolbar.slots)
                 if event.button == 3 :
                     start_pos = mouse_pos
                     selecting = True
@@ -451,16 +456,22 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,player):
                 if event.button == 1 and dragging_item:
                     from_slot, item, quantity = dragging_item
                     placed = False
-                    if show_inventory:
-                        for slot in player.inventory.slots:
-                            if slot.is_hovered(mouse_pos):
-                                if slot.item is None:
-                                    slot.item = item
-                                    slot.quantity = quantity
-                                elif slot.item.name == item.name:
-                                    slot.quantity += quantity
-                                placed = True
-                                break
+
+                    for slot in player.inventory.slots:
+                        if slot.is_hovered(mouse_pos):
+                            if slot.item is None:
+                                slot.item = item
+                                slot.quantity = quantity
+                            elif slot.item.name == item.name:
+                                from_slot.item = None
+                                slot.quantity += quantity
+                            elif slot.item.name != item.name:
+                                from_slot.item = slot.item
+                                from_slot.quantity = slot.quantity
+                                slot.item = item
+                                slot.quantity = quantity
+                            placed = True
+                            break
                     if not placed:
                         for slot in player.toolbar.slots:
                             if slot.is_hovered(mouse_pos):
@@ -469,6 +480,12 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,player):
                                     slot.quantity = quantity
                                 elif slot.item.name == item.name:
                                     slot.quantity += quantity
+                                elif slot.item.name != item.name:
+                                    print("yes")
+                                    from_slot.item = slot.item
+                                    from_slot.quantity = slot.quantity
+                                    slot.item = item
+                                    slot.quantity = quantity
                                 placed = True
                                 break
                     if not placed:

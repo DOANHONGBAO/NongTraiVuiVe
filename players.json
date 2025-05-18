@@ -604,16 +604,19 @@
         "yard": []
     },
     "doanhongbao": {
-        "gold": 4841,
+        "gold": 4754,
         "animals": [
             "D\u00ea",
             "B\u00f2",
+            "C\u1eebu",
+            "G\u00e0",
+            "Heo",
             "C\u1eebu"
         ],
         "food": [],
         "hand": [
             {
-                "name": "B\u1ed1c th\u00eam l\u00e1",
+                "name": "Nh\u00e2n \u0111\u00f4i \u0111i\u1ec3m",
                 "value": 0
             },
             {
@@ -621,16 +624,16 @@
                 "value": 10
             },
             {
-                "name": "L\u1ec5 h\u1ed9i l\u00e0ng",
+                "name": "B\u00e1n rau c\u1ee7",
+                "value": 4
+            },
+            {
+                "name": "Kh\u00f3 kh\u0103n t\u00e0i ch\u00ednh",
+                "value": -10
+            },
+            {
+                "name": "Th\u00eam b\u1ea1n b\u1edbt th\u00f9",
                 "value": 5
-            },
-            {
-                "name": "Thu ho\u1ea1ch m\u00f9a",
-                "value": 7
-            },
-            {
-                "name": "B\u1ea1n b\u00e8 t\u1eb7ng qu\u00e0",
-                "value": 3
             }
         ],
         "score_multiplier": 1,
@@ -639,22 +642,415 @@
             {
                 "name": "D\u00ea",
                 "cost": 22,
-                "x": 788.9034876152049,
-                "y": 445.8546333591433,
+                "x": 459.42899858541307,
+                "y": 350.23103193917484,
                 "index": 0
             },
             {
                 "name": "B\u00f2",
                 "cost": 25,
-                "x": 918.1054341035714,
-                "y": 645.4977670709313,
+                "x": 1285.930432557022,
+                "y": 483.34296245188796,
                 "index": 0
             },
             {
                 "name": "C\u1eebu",
                 "cost": 22,
-                "x": 960.7355527790162,
-                "y": 407.45421973977545,
+                "x": 1190.6124985106474,
+                "y": 504.97111093421205,
+                "index": 0
+            },
+            {
+                "name": "G\u00e0",
+                "cost": 15,
+                "x": 911.3856712935667,
+                "y": 530.8694810142509,
+                "index": 0
+            },
+            {
+                "name": "Heo",
+                "cost": 20,
+                "x": 557.5413065955433,
+                "y": 641.7255728977811,
+                "index": 0
+            },
+            {
+                "name": "C\u1eebu",
+                "cost": 22,
+                "x": 874.4934811606407,
+                "y": 519.9016831043771,
+                "index": 0
+            }
+        ],
+        "toolbar": [
+            {
+                "item": {
+                    "name": "Carbage",
+                    "index": 28,
+                    "base_x": 0,
+                    "base_y": 0,
+                    "angle": 0,
+                    "angle_direction": 1,
+                    "float_offset": 0,
+                    "float_timer": 0,
+                    "bouncing": true,
+                    "bounce_velocity": -5,
+                    "gravity": 0.5,
+                    "offset_y": 0
+                },
+                "quantity": 869
+            },
+            {
+                "item": {
+                    "name": "Corn",
+                    "index": 7,
+                    "base_x": 0,
+                    "base_y": 0,
+                    "angle": 0,
+                    "angle_direction": 1,
+                    "float_offset": 0,
+                    "float_timer": 0,
+                    "bouncing": true,
+                    "bounce_velocity": -5,
+                    "gravity": 0.5,
+                    "offset_y": 0
+                },
+                "quantity": 2
+            },
+            {
+                "item": {
+                    "name": "Rice",
+                    "index": 3,
+                    "base_x": 650,
+                    "base_y": 168,
+                    "angle": -2.5,
+                    "angle_direction": 1,
+                    "float_offset": 2.6472973286019825,
+                    "float_timer": 15.15000000000008,
+                    "bouncing": false,
+                    "bounce_velocity": 5.5,
+                    "gravity": 0.5,
+                    "offset_y": 0
+                },
+                "quantity": 544
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            }
+        ],
+        "inventory": [
+            {
+                "item": {
+                    "name": "Carbage",
+                    "index": 28,
+                    "base_x": 648,
+                    "base_y": 175,
+                    "angle": -4.0,
+                    "angle_direction": 1,
+                    "float_offset": 4.630750103403179,
+                    "float_timer": 32.600000000000286,
+                    "bouncing": false,
+                    "bounce_velocity": 5.5,
+                    "gravity": 0.5,
+                    "offset_y": 0
+                },
+                "quantity": 448
+            },
+            {
+                "item": {
+                    "name": "Rice",
+                    "index": 3,
+                    "base_x": 327,
+                    "base_y": 180,
+                    "angle": 2.5,
+                    "angle_direction": -1,
+                    "float_offset": -4.614732255049155,
+                    "float_timer": 29.450000000000284,
+                    "bouncing": false,
+                    "bounce_velocity": 5.5,
+                    "gravity": 0.5,
+                    "offset_y": 0
+                },
+                "quantity": 288
+            },
+            {
+                "item": {
+                    "name": "Corn",
+                    "index": 7,
+                    "base_x": 1137,
+                    "base_y": 497,
+                    "angle": -4.0,
+                    "angle_direction": 1,
+                    "float_offset": 4.272994540441443,
+                    "float_timer": 8.399999999999984,
+                    "bouncing": false,
+                    "bounce_velocity": 5.5,
+                    "gravity": 0.5,
+                    "offset_y": 0
+                },
+                "quantity": 64
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            }
+        ],
+        "current_day": 1,
+        "yard": []
+    },
+    "newbie": {
+        "gold": 4945,
+        "animals": [
+            "Heo",
+            "B\u00f2"
+        ],
+        "food": [],
+        "hand": [
+            {
+                "name": "L\u1ec5 k\u1ef7 ni\u1ec7m l\u1edbn",
+                "value": 12
+            },
+            {
+                "name": "M\u01b0a l\u1edbn",
+                "value": -5
+            },
+            {
+                "name": "Kh\u00f3 kh\u0103n t\u00e0i ch\u00ednh",
+                "value": -10
+            },
+            {
+                "name": "N\u00e2ng c\u1ea5p c\u01a1 s\u1edf h\u1ea1 t\u1ea7ng",
+                "value": 10
+            },
+            {
+                "name": "M\u00f9a m\u00e0ng b\u1ed9i thu",
+                "value": 10
+            }
+        ],
+        "score_multiplier": 1,
+        "score_exponent": 1,
+        "animals_on_field": [
+            {
+                "name": "Heo",
+                "cost": 20,
+                "x": 615.0636444436857,
+                "y": 365.28724056315633,
+                "index": 0
+            },
+            {
+                "name": "B\u00f2",
+                "cost": 25,
+                "x": 444.67956100165685,
+                "y": 465.6270492493877,
                 "index": 0
             }
         ],
@@ -674,12 +1070,284 @@
                     "gravity": 0.5,
                     "offset_y": 0
                 },
-                "quantity": 770
+                "quantity": 1
             },
             {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            }
+        ],
+        "inventory": [
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            }
+        ],
+        "current_day": 1,
+        "yard": []
+    },
+    "doanhongabo": {
+        "gold": 4970,
+        "animals": [],
+        "food": [],
+        "hand": [
+            {
+                "name": "Nh\u00e2n ba \u0111i\u1ec3m",
+                "value": 0
+            },
+            {
+                "name": "M\u00f9a m\u00e0ng b\u1ed9i thu",
+                "value": 10
+            },
+            {
+                "name": "L\u0169y th\u1eeba \u0111i\u1ec3m x2",
+                "value": 0
+            },
+            {
+                "name": "H\u1ed7 tr\u1ee3 c\u1ed9ng \u0111\u1ed3ng",
+                "value": -3
+            },
+            {
+                "name": "B\u1ea1n b\u00e8 t\u1eb7ng qu\u00e0",
+                "value": 3
+            }
+        ],
+        "score_multiplier": 1,
+        "score_exponent": 1,
+        "animals_on_field": [],
+        "toolbar": [
+            {
                 "item": {
-                    "name": "Carbage",
-                    "index": 28,
+                    "name": "Corn",
+                    "index": 7,
                     "base_x": 0,
                     "base_y": 0,
                     "angle": 0,
@@ -691,12 +1359,50 @@
                     "gravity": 0.5,
                     "offset_y": 0
                 },
-                "quantity": 772
+                "quantity": 193
             },
             {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            }
+        ],
+        "inventory": [
+            {
                 "item": {
-                    "name": "Carrot",
-                    "index": 2,
+                    "name": "Straw_berry",
+                    "index": 4,
                     "base_x": 0,
                     "base_y": 0,
                     "angle": 0,
@@ -708,7 +1414,249 @@
                     "gravity": 0.5,
                     "offset_y": 0
                 },
-                "quantity": 771
+                "quantity": 1
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            }
+        ],
+        "current_day": 4,
+        "yard": []
+    },
+    "a": {
+        "gold": 5000,
+        "animals": [],
+        "food": [],
+        "hand": [
+            {
+                "name": "M\u00f9a m\u00e0ng b\u1ed9i thu",
+                "value": 10
+            },
+            {
+                "name": "M\u01b0a l\u1edbn",
+                "value": -5
+            },
+            {
+                "name": "Th\u00eam b\u1ea1n b\u1edbt th\u00f9",
+                "value": 5
+            },
+            {
+                "name": "G\u1eb7p may m\u1eafn",
+                "value": 5
+            },
+            {
+                "name": "Nh\u00e2n ba \u0111i\u1ec3m",
+                "value": 0
+            }
+        ],
+        "score_multiplier": 1,
+        "score_exponent": 1,
+        "animals_on_field": [],
+        "toolbar": [
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
+            },
+            {
+                "item": null,
+                "quantity": 0
             },
             {
                 "item": null,

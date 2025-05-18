@@ -83,6 +83,7 @@ def farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, curren
     current_pos = (-1, -1)
     selection_rect = None
     dragging_item = None
+    selected_toolbar_index = 0  # Mặc định chọn ô đầu tiên
     # Load hình ảnh nút
     toolbar_image = pygame.image.load("assets/images/toolbar.png").convert_alpha()
     image_normal = pygame.image.load("assets//GUI/ButtonsIcons/IconButton_Large_Circle.png").convert_alpha()
@@ -132,7 +133,7 @@ def farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, curren
 
         gold_text = FONT.render(f"Vàng: {player.gold}", True, COLORS["YELLOW"])
         SCREEN.blit(gold_text, (30, 150))
-        selected_toolbar_index = 0  # Mặc định chọn ô đầu tiên
+
         if player.toolbar.slots:
             slot = player.toolbar.slots[selected_toolbar_index]
             slot.selected = True
@@ -195,8 +196,9 @@ def farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, curren
         # Vẽ ảnh thanh công cụ
         SCREEN.blit(toolbar_image, (toolbar_x, toolbar_y))
         #slot_toolbar
-        for slot in player.slot_positions:
-            slot.draw(SCREEN,FONT)
+        for i, slot in enumerate(player.toolbar.slots):
+            slot.selected = (i == selected_toolbar_index)
+            slot.draw(SCREEN, FONT)
         if dragging_item:
             _, dragging_image, dragging_quantity = dragging_item
             if dragging_image:
@@ -210,6 +212,11 @@ def farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, curren
                 sys.exit()
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
+                # Scroll wheel interaction
+                if event.button == 4:  # Scroll up
+                    selected_toolbar_index = (selected_toolbar_index - 1) % len(player.toolbar.slots)
+                elif event.button == 5:  # Scroll down
+                    selected_toolbar_index = (selected_toolbar_index + 1) % len(player.toolbar.slots)
                 # print(mouse_pos)
                 if event.button == 3 :
                     start_pos = mouse_pos
@@ -279,6 +286,11 @@ def farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, curren
                                     slot.quantity = quantity
                                 elif slot.item.name == item.name:
                                     slot.quantity += quantity
+                                elif slot.item.name != item.name:
+                                    from_slot.item = slot.item
+                                    from_slot.quantity = slot.quantity
+                                    slot.item = item
+                                    slot.quantity = quantity
                                 placed = True
                                 break
                     if not placed:
@@ -289,6 +301,11 @@ def farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, curren
                                     slot.quantity = quantity
                                 elif slot.item.name == item.name:
                                     slot.quantity += quantity
+                                elif slot.item.name != item.name:
+                                    from_slot.item = slot.item
+                                    from_slot.quantity = slot.quantity
+                                    slot.item = item
+                                    slot.quantity = quantity
                                 placed = True
                                 break
                     if not placed:
