@@ -16,7 +16,6 @@ from animal import Animal
 from tiles import TileMap
 from GUI import ImageButton
 from items import Slot,Inventory,HarvestNotification,Item
-# from main import save_player_data
 # Global constants
 CARD_WIDTH, CARD_HEIGHT = 200, 300
 ITEM_WIDTH, ITEM_HEIGHT = 30, 45
@@ -56,8 +55,7 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,player):
     clock = pygame.time.Clock()
     count_select_one_day = 3
     merchant = Merchant()
-    show_merchant = True
-    show_items = False
+    show_merchant = False
     buy_merchant = True
     first_time = True
     show_score_summary = False
@@ -73,7 +71,8 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,player):
     merchant_buttons = []  # Reset mỗi frame
     selected_toolbar_index = 0
     tilemap = TileMap("assets/tiles/background.tmx")
-
+    sell_sound = pygame.mixer.Sound("assets/audios/sell.mp3")
+    truck_sound = pygame.mixer.Sound("assets/audios/truck.mp3")
     # Buttons
     # Load hình ảnh
     toolbar_image = pygame.image.load("assets/images/toolbar.png").convert_alpha()
@@ -86,49 +85,11 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,player):
     image_normal = pygame.image.load("assets/GUI/ButtonsIcons/IconButton_Large_Circle.png").convert_alpha()
     image_hover = pygame.image.load("assets/GUI/ButtonsIcons/IconButton_Large_GreyOutline_Circle.png").convert_alpha()
 
-    # Tải hình tam giác
-    image_triangle = pygame.image.load("assets/GUI/Sliders/ScrollSlider_Arrow.png").convert_alpha()
-    image_triangle = pygame.transform.scale(image_triangle, (60, 60))
-    image_triangle_hover = pygame.image.load("assets/GUI/Sliders/ScrollSlider_Blank_Arrow.png").convert_alpha()
-    image_triangle_hover = pygame.transform.scale(image_triangle_hover, (60, 60))
-    image_btn_see_inventory = pygame.image.load("assets/GUI/ButtonsIcons/IconButton_Large_Circle.png").convert_alpha()
-    image_see_inventory_hover = pygame.image.load("assets/GUI/ButtonsIcons/IconButton_Large_GreyOutline_Circle.png").convert_alpha()
-    #Tải hình ảnh quay lại
-    image_return = pygame.image.load("assets/GUI/Icons/Icon_Small_WhiteOutline_Arrow.png").convert_alpha()
-    image_return = pygame.transform.rotate(image_return,180)
-    image_return_hover = pygame.image.load("assets/GUI/Icons/Icon_Small_Blank_Arrow.png").convert_alpha()
+    coin_image = pygame.image.load("assets/images/coin.png").convert_alpha()
+    coin_image = pygame.transform.scale(coin_image, (20, 20))  # Resize vừa phải
+
+
     # Tạo các nút sử dụng ImageButton với hiệu ứng hover
-    back_btn = ImageButton(
-        WIDTH - BUTTON_WIDTH - 30, 30, BUTTON_WIDTH, BUTTON_HEIGHT,
-        "Quay lại Menu", FONT,
-        (255, 255, 255),  # màu chữ bình thường
-        image_normal, image_hover,
-        hover_text_color=(255, 255, 0)  # vàng khi hover
-    )
-
-    next_day_btn = ImageButton(
-        WIDTH - BUTTON_WIDTH - 30, 150, BUTTON_WIDTH, BUTTON_HEIGHT,
-        "Qua ngày", FONT,
-        (255, 255, 255),
-        image_normal, image_hover,
-        hover_text_color=(255, 255, 0)
-    )
-
-    roll_btn = ImageButton(
-        WIDTH - BUTTON_WIDTH - 30, 230, BUTTON_WIDTH, BUTTON_HEIGHT,
-        "Rút lại bài", FONT,
-        (255, 255, 255),
-        image_normal, image_hover,
-        hover_text_color=(255, 255, 0)
-    )
-
-    play_btn = ImageButton(
-        WIDTH - BUTTON_WIDTH - 30, 310, BUTTON_WIDTH, BUTTON_HEIGHT,
-        "Tính điểm", FONT,
-        (255, 255, 255),
-        image_normal, image_hover,
-        hover_text_color=(255, 255, 0)
-    )
 
     toggle_card_btn = ImageButton(
         30, HEIGHT - 80, 200, 50,
@@ -138,44 +99,7 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,player):
         hover_text_color=(255, 255, 0)
     )
 
-    farm_btn = ImageButton(
-        0, HEIGHT // 2 - 30, 60, 60,
-        "", FONT,  # không có text
-        (0, 0, 0),
-        image_triangle,
-        image_triangle_hover  # có thể dùng cùng một hình cho hover nếu không có ảnh riêng
-    )
 
-    see_inventory_btn = ImageButton(
-        1370, 883, 100, 100,
-        "", FONT,
-        (255, 255, 255),
-        image_btn_see_inventory, image_see_inventory_hover,
-        hover_text_color=(255, 255, 0)
-    )
-
-    see_items_btn = ImageButton(
-        50, 300, BUTTON_WIDTH, 60,
-        "Xem hàng từ thương gia", FONT,
-        (255, 255, 255),
-        image_normal, image_hover,
-        hover_text_color=(255, 255, 0)
-    )
-
-    back_merchant_btn = ImageButton(
-        1375, 158, 120, 90,
-        "",FONT,
-        (255, 255, 255),
-        image_return, image_return,
-        hover_text_color=(255, 255, 0)
-    )
-    confirm_btn = ImageButton(
-        WIDTH // 2 - 100, HEIGHT // 2 + 80, 200, 60,
-        "OK. Quay lại Menu", FONT,
-        (255, 255, 255),
-        image_normal, image_hover,
-        hover_text_color=(255, 255, 0)
-    )
 
 
     def draw_cards():
@@ -184,7 +108,9 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,player):
             selected_card[i] = False
 
     draw_cards()
+    last = 0
     while True:
+
         mouse_pos = pygame.mouse.get_pos()
         SCREEN.fill(COLORS["GREEN"])
         tilemap.draw(SCREEN)
@@ -194,9 +120,12 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,player):
             merchant = Merchant()
             show_merchant = True
             buy_merchant = False
+        now = pygame.time.get_ticks()
+        if now - last >= 300000:
+            merchant = Merchant()
+            truck_sound.play()
+            last = now 
 
-        # UI Text
-        SCREEN.blit(BIG_FONT.render(f"Vàng: {player.gold}", True, COLORS["YELLOW"]), (30, 30))
 
         # Animal drawing
         for animal in player.animals_on_field:
@@ -211,12 +140,30 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,player):
 
 
         # Buttons rendering
-        for btn in [back_btn, next_day_btn, roll_btn, play_btn, toggle_card_btn,farm_btn,see_inventory_btn]:
+        for btn in [ toggle_card_btn]:
             btn.draw(SCREEN, mouse_pos)
 
 
 
-        
+        # --- VẼ HUD GÓC PHẢI TRÊN ---
+        hud_width, hud_height = 250, 75
+        hud_x = WIDTH - hud_width - 20
+        hud_y = 20
+
+        # Nền gỗ nâu trầm
+        pygame.draw.rect(SCREEN, (95, 65, 40), (hud_x, hud_y, hud_width, hud_height), border_radius=8)
+
+        # Viền vàng ánh cam
+        pygame.draw.rect(SCREEN, (255, 200, 80), (hud_x, hud_y, hud_width, hud_height), 3, border_radius=8)
+
+        # Vẽ icon coin
+        SCREEN.blit(coin_image, (hud_x + 10, (hud_y + hud_height) / 2))
+
+        # Vẽ số vàng (vàng sáng, đổ bóng nhẹ)
+        gold_text = FONT.render(": "f'{player.gold}', True, (255, 255, 160))  # Vàng sáng nhẹ
+        SCREEN.blit(gold_text, (hud_x + 40, hud_y + 2))
+
+                        
 
         # Card logic
         if "card_y_offsets" not in player.__dict__ or len(player.card_y_offsets) != len(player.hand):
@@ -259,11 +206,7 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,player):
         # ===================== GIAO DIỆN THƯƠNG GIA =====================
         merchant_buttons = []
 
-        if show_merchant and not show_items:
-            see_items_btn.draw(SCREEN,mouse_pos)
-
-
-        elif show_merchant and show_items:
+        if show_merchant:
             # Xác định kích thước của cửa hàng
             shop_width = shop_image.get_width() # 1200
             shop_height = shop_image.get_height() #800
@@ -297,7 +240,6 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,player):
 
                     merchant_buttons.append((item_box, item))  # Lưu item_box thay vì buy_btn
 
-            back_merchant_btn.draw(SCREEN,mouse_pos)
         if selecting and current_pos != (-1,-1):
             x1, y1 = start_pos
             x2, y2 = current_pos
@@ -357,12 +299,7 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,player):
                                 elif selected_card[i]:
                                     selected_card[i] = False
                                 break
-
-                if show_merchant and not show_items:
-                    if see_items_btn.is_clicked(event):
-                        show_items = True
-
-                elif show_merchant and show_items:
+                if show_merchant:
                     for item_box, item in merchant_buttons:  # Đổi từ (btn, item) sang (item_box, item)
                         # Kiểm tra click vào pot_image
                         if item_box.collidepoint(event.pos) and player.gold >= item.cost:
@@ -374,41 +311,9 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,player):
                                 player.inventory.add_item(item)  # thêm vào túi đồ
                             merchant.items.remove(item)
                             break
-
-                    if back_merchant_btn.is_clicked(event):
-                        show_items = False
-
-
-                if show_score_summary and confirm_btn.is_clicked(event):
-                    return "back_to_menu"
-
-                if back_btn.is_clicked(event):
-                    show_score_summary = True
+            
                 if toggle_card_btn.is_clicked(event):
                     show_card_frame = not show_card_frame
-                if play_btn.is_clicked(event):
-                    temp = []
-                    for i, card in enumerate(player.hand):
-                        if selected_card[i]:
-                            player.gold += card.value
-                            temp.append(card)
-                            count_select_one_day -= 1
-                            selected_card[i] = False
-                    for card in temp:
-                        player.hand.remove(card)
-                if next_day_btn.is_clicked(event):
-                    current_day += 1
-                    rolls_left = 1
-                    draw_cards()
-                    buy_merchant = True
-                    show_merchant = False
-                    show_items = False
-                    count_select_one_day = 3
-                if roll_btn.is_clicked(event) and rolls_left > 0:
-                    draw_cards()
-                    rolls_left -= 1
-                if see_inventory_btn.is_clicked(event):
-                    show_inventory = not show_inventory
                 if event.button == 1:  # Chuột trái
                     if show_inventory:
                         for slot in player.inventory.slots:
@@ -422,9 +327,6 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,player):
                                 dragging_item = (slot, slot.item, slot.quantity)
                                 slot.clear()
                                 break
-                if farm_btn.is_clicked(event):
-            
-                    return "go_to_farming", player, current_day
             elif event.type == pygame.MOUSEMOTION:
                 if selecting:
                     current_pos = mouse_pos
@@ -494,6 +396,23 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,player):
                         from_slot.quantity = quantity
 
                     dragging_item = None
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_e:
+                    show_inventory = not show_inventory
+                elif event.key == pygame.K_m:
+                    show_merchant = not show_merchant
+                elif event.key == pygame.K_LEFT:
+                    return "go_to_farming", player, current_day
+                elif event.key == pygame.K_ESCAPE:
+                    return "back_to_menu"
+                elif event.key == pygame.K_s:
+                    # Bán item đang được kéo
+                    if dragging_item:
+                        from_slot, item, quantity = dragging_item
+                        sell_price = 5 * quantity * 0.75  # Bán giá nửa giá gốc
+                        player.gold += sell_price
+                        dragging_item = None
+                        sell_sound.play()  # 🔊 Phát âm thanh
 
         pygame.display.update()
         clock.tick(60)

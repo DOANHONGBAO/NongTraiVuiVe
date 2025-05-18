@@ -64,14 +64,18 @@ def login_screen(screen, width, height, font, big_font, colors, clock, current_u
                                     players_data = json.load(f)
                                     if username in players_data:
                                         player = Player.from_dict(players_data[username])
+                                        player.name = username
                                         current_day = players_data[username].get('current_day', 1)
                                     else:
                                         player = Player()
+                                        player.name = username
                                 else:
                                     print("Warning: players.json is empty, creating new player")
                                     player = Player()
+                                    player.name = username
                         else:
                             player = Player()
+                            player.name = username
                         
                         return "success", {
                             'current_user': current_user,
@@ -81,6 +85,7 @@ def login_screen(screen, width, height, font, big_font, colors, clock, current_u
                     except json.JSONDecodeError as e:
                         print(f"Error decoding players.json: {e}. Creating new player")
                         player = Player()
+                        player.name = username
                         return "success", {
                             'current_user': current_user,
                             'player': player,

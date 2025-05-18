@@ -28,7 +28,7 @@ class Item:
         self.bounce_velocity = -5  # tốc độ nảy ban đầu
         self.gravity = 0.5
         self.offset_y = 0  # độ lệch khi nảy
-
+        # self.cost = 0
     def update(self):
         if self.bouncing:
             self.offset_y += self.bounce_velocity

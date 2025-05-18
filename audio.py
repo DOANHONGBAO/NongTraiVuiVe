@@ -6,7 +6,11 @@ import threading
 MUSIC_TRACKS = [
     "assets/audios/music1.mp3",
     "assets/audios/music2.mp3",
-    "assets/audios/music3.mp3"
+    "assets/audios/music3.mp3",
+    "assets/audios/music4.mp3",
+    "assets/audios/music5.mp3",
+    "assets/audios/music6.mp3",
+    "assets/audios/music7.mp3"
 ]
 
 MUSIC_INTERVAL = 300  # 5 phút = 300 giây
@@ -15,7 +19,7 @@ running = True
 
 def play_music_loop():
     global current_track_index
-    pygame.mixer.init()
+    # pygame.mixer.init()
     
     while running:
         track_path = MUSIC_TRACKS[current_track_index]

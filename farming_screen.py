@@ -15,11 +15,11 @@ def create_plants():
     rice_images = [pygame.image.load(f"assets/plants/rice/rice{i}.png").convert_alpha() for i in range(4)]
     # Tạo các cây
     plants = [
-        Plant(name="Carrot", x=0, y=0, growth_stages=[0, 1, 2, 3], growth_time=4000, images=carrot_images,index = 0,indexob = 2),
-        Plant(name="Corn", x=0, y=0, growth_stages=[0, 1, 2, 3], growth_time=10000, images=corn_images,indexob = 7),
-        Plant(name="Straw_berry", x=0, y=0, growth_stages=[0, 1, 2, 3], growth_time=10000, images=straw_berry_images, indexob = 4),
-        Plant(name="Carbage", x=0, y=0, growth_stages=[0, 1, 2, 3], growth_time=10000, images=carbage_images, indexob = 28),
-        Plant(name="Rice", x=0, y=0, growth_stages=[0, 1, 2, 3], growth_time=10000, images=rice_images, indexob = 3),
+        Plant(name="Carrot", x=0, y=0, growth_stages=[0, 1, 2, 3], growth_time=300000, images=carrot_images,index = 0,indexob = 2),
+        Plant(name="Corn", x=0, y=0, growth_stages=[0, 1, 2, 3], growth_time=30000, images=corn_images,indexob = 7),
+        Plant(name="Straw_berry", x=0, y=0, growth_stages=[0, 1, 2, 3], growth_time=1500000, images=straw_berry_images, indexob = 4),
+        Plant(name="Carbage", x=0, y=0, growth_stages=[0, 1, 2, 3], growth_time=2000000, images=carbage_images, indexob = 28),
+        Plant(name="Rice", x=0, y=0, growth_stages=[0, 1, 2, 3], growth_time=500000, images=rice_images, indexob = 3),
     ]
     
     return plants
@@ -86,40 +86,15 @@ def farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, curren
     selected_toolbar_index = 0  # Mặc định chọn ô đầu tiên
     # Load hình ảnh nút
     toolbar_image = pygame.image.load("assets/images/toolbar.png").convert_alpha()
-    image_normal = pygame.image.load("assets//GUI/ButtonsIcons/IconButton_Large_Circle.png").convert_alpha()
-    image_hover = pygame.image.load("assets/GUI/ButtonsIcons/IconButton_Large_GreyOutline_Circle.png").convert_alpha()
-    image_btn_see_inventory = pygame.image.load("assets/GUI/ButtonsIcons/IconButton_Large_Circle.png").convert_alpha()
-    image_see_inventory_hover = pygame.image.load("assets/GUI/ButtonsIcons/IconButton_Large_GreyOutline_Circle.png").convert_alpha()
-    image_triangle = pygame.image.load("assets/GUI/Sliders/ScrollSlider_Arrow.png").convert_alpha()
-    image_triangle = pygame.transform.rotate(image_triangle, 180)
-    image_triangle = pygame.transform.scale(image_triangle, (60, 60))
-    image_triangle_hover = pygame.image.load("assets/GUI/Sliders/ScrollSlider_Blank_Arrow.png").convert_alpha()
-    image_triangle_hover = pygame.transform.rotate(image_triangle_hover, 180)
-    image_triangle_hover = pygame.transform.scale(image_triangle_hover, (60, 60))
     # Tạo nút quay lại bằng ImageButton có hiệu ứng hover
-    back_btn = ImageButton(
-        WIDTH - 70, HEIGHT // 2 - 50,
-        60, 60,
-        "", FONT,
-        (255, 255, 255),  # màu chữ thường
-        image_triangle, image_triangle_hover
-    )
-    see_inventory_btn = ImageButton(
-        1370, 883, 100, 100,
-        "", FONT,
-        (255, 255, 255),
-        image_btn_see_inventory, image_see_inventory_hover,
-        hover_text_color=(255, 255, 0)
-    )
+
     
     # Load bản đồ TMX
     tmx_data = pytmx.load_pygame("assets/tiles/background_farm.tmx")
     inventory_image = pygame.image.load("assets/images/inventory.png").convert_alpha()
-    # Biến lưu cây được chọn để trồng
-    selected_plant = []
+    selected_plant = None
     while True:
         mouse_pos = pygame.mouse.get_pos()
-        SCREEN.fill(COLORS["LIGHT_GREEN"])
         
         # ===== VẼ BẢN ĐỒ =====
         for layer in tmx_data.visible_layers:
@@ -140,9 +115,10 @@ def farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, curren
             if slot.item and slot.item.name in ["Carrot", "Corn", "Straw_berry", "Carbage", "Rice"]:
                 for p in plants:
                     if p.name == slot.item.name:
-                        selected_plant.clear()
-                        selected_plant.append(p)
+                        selected_plant = p
                         break
+            else:
+                selected_plant = None
         # Vẽ các cây đã trồng trong các thửa ruộng
         for field in fields:
             if field.plants:
@@ -187,8 +163,6 @@ def farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, curren
             height = abs(y1 - y2)
             pygame.draw.rect(SCREEN, (0, 255, 0), (left, top, width, height), 2)   
         # Buttons rendering
-        for btn in [back_btn,see_inventory_btn]:
-            btn.draw(SCREEN, mouse_pos)
         if show_inventory: 
             SCREEN.blit(inventory_image, (inventory_x, inventory_y))
             for slot in player.inventory_position:
@@ -223,14 +197,23 @@ def farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, curren
                     selecting = True
                 #Giả sử bạn có object `selected_plant` để trồng lại
                 if not show_inventory : 
-                    if selected_plant:
+                    if selected_plant != None:
+                        for slot in player.toolbar.slots:
+                            if slot.selected:
+                                temp = slot.item
                         for field in fields:
                             if field.is_clicked(mouse_pos) and event.button == 1:
-                                field.plant_crops(selected_plant[0], selected_plant[0].images)
+                                field.plant_crops(selected_plant, selected_plant.images)
+
+                                # Trồng cây thì giảm 1 đơn vị trong toolbar
+                                slot = player.toolbar.slots[selected_toolbar_index]
+                                if slot.item and slot.quantity > 1:
+                                    slot.quantity -= 1
+                                else:
+                                    slot.clear()
+
                                 dropped = field.try_harvest()
                                 yard.extend(dropped)
-                if see_inventory_btn.is_clicked(event):
-                    show_inventory = not show_inventory
                 if event.button == 1:  # Chuột trái
                     if show_inventory:
                         for slot in player.inventory.slots:
@@ -244,9 +227,6 @@ def farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, curren
                             dragging_item = (slot, slot.item, slot.quantity)
                             slot.clear()
                             break
-                # Kiểm tra nếu click vào nút "Quay lại Game"
-                if back_btn.is_clicked(event):  # ✅ Sửa lỗi truyền tuple
-                    return "back_to_gameplay"
             elif event.type == pygame.MOUSEMOTION:
                 if selecting:
                     current_pos = mouse_pos
@@ -314,6 +294,12 @@ def farming_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS, player, curren
                         from_slot.quantity = quantity
 
                     dragging_item = None
-        
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_e:
+                    show_inventory = not show_inventory
+                elif event.key == pygame.K_RIGHT:
+                    return "back_to_gameplay"
+                elif event.key == pygame.K_ESCAPE:
+                    return "back_to_menu"
         pygame.display.update()
         clock.tick(60)

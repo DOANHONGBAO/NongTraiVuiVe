@@ -604,36 +604,48 @@
         "yard": []
     },
     "doanhongbao": {
-        "gold": 4754,
+        "gold": 18650.75,
         "animals": [
             "D\u00ea",
             "B\u00f2",
             "C\u1eebu",
             "G\u00e0",
             "Heo",
-            "C\u1eebu"
+            "C\u1eebu",
+            "B\u00f2",
+            "G\u00e0",
+            "B\u00f2",
+            "Heo",
+            "Heo",
+            "C\u1eebu",
+            "G\u00e0",
+            "Heo",
+            "Heo",
+            "Heo",
+            "Heo",
+            "G\u00e0"
         ],
         "food": [],
         "hand": [
             {
-                "name": "Nh\u00e2n \u0111\u00f4i \u0111i\u1ec3m",
-                "value": 0
-            },
-            {
-                "name": "M\u00f9a m\u00e0ng b\u1ed9i thu",
-                "value": 10
-            },
-            {
-                "name": "B\u00e1n rau c\u1ee7",
-                "value": 4
-            },
-            {
-                "name": "Kh\u00f3 kh\u0103n t\u00e0i ch\u00ednh",
-                "value": -10
+                "name": "Chuy\u1ebfn \u0111i du l\u1ecbch",
+                "value": 2
             },
             {
                 "name": "Th\u00eam b\u1ea1n b\u1edbt th\u00f9",
                 "value": 5
+            },
+            {
+                "name": "N\u00e2ng c\u1ea5p c\u01a1 s\u1edf h\u1ea1 t\u1ea7ng",
+                "value": 10
+            },
+            {
+                "name": "T\u00ecnh c\u1edd g\u1eb7p kh\u00e1ch qu\u00fd",
+                "value": 15
+            },
+            {
+                "name": "L\u0169y th\u1eeba \u0111i\u1ec3m x2",
+                "value": 0
             }
         ],
         "score_multiplier": 1,
@@ -642,47 +654,135 @@
             {
                 "name": "D\u00ea",
                 "cost": 22,
-                "x": 459.42899858541307,
-                "y": 350.23103193917484,
+                "x": 946.9432068887489,
+                "y": 641.1300762769454,
                 "index": 0
             },
             {
                 "name": "B\u00f2",
                 "cost": 25,
-                "x": 1285.930432557022,
-                "y": 483.34296245188796,
+                "x": 947.6473393336788,
+                "y": 488.3877451957179,
                 "index": 0
             },
             {
                 "name": "C\u1eebu",
                 "cost": 22,
-                "x": 1190.6124985106474,
-                "y": 504.97111093421205,
+                "x": 733.9092561420416,
+                "y": 348.51162918155995,
                 "index": 0
             },
             {
                 "name": "G\u00e0",
                 "cost": 15,
-                "x": 911.3856712935667,
-                "y": 530.8694810142509,
+                "x": 1043.2530692877788,
+                "y": 492.36331556185854,
                 "index": 0
             },
             {
                 "name": "Heo",
                 "cost": 20,
-                "x": 557.5413065955433,
-                "y": 641.7255728977811,
+                "x": 715.6077634009946,
+                "y": 492.5278988263029,
                 "index": 0
             },
             {
                 "name": "C\u1eebu",
                 "cost": 22,
-                "x": 874.4934811606407,
-                "y": 519.9016831043771,
+                "x": 622.773091201061,
+                "y": 528.930419877315,
+                "index": 0
+            },
+            {
+                "name": "B\u00f2",
+                "cost": 25,
+                "x": 578.4755260981333,
+                "y": 388.5943449868658,
+                "index": 0
+            },
+            {
+                "name": "G\u00e0",
+                "cost": 15,
+                "x": 983.5145052975789,
+                "y": 346.3181198755291,
+                "index": 0
+            },
+            {
+                "name": "B\u00f2",
+                "cost": 25,
+                "x": 1076.5734351319459,
+                "y": 383.9140359377601,
+                "index": 0
+            },
+            {
+                "name": "Heo",
+                "cost": 20,
+                "x": 1263.7622369347312,
+                "y": 620.2274945943851,
+                "index": 0
+            },
+            {
+                "name": "Heo",
+                "cost": 20,
+                "x": 949.278345093835,
+                "y": 623.4347863288297,
+                "index": 0
+            },
+            {
+                "name": "C\u1eebu",
+                "cost": 22,
+                "x": 1261.716365752697,
+                "y": 366.9395881756186,
+                "index": 0
+            },
+            {
+                "name": "G\u00e0",
+                "cost": 15,
+                "x": 1254.454553761884,
+                "y": 388.5296944294429,
+                "index": 0
+            },
+            {
+                "name": "Heo",
+                "cost": 20,
+                "x": 916.9003329458653,
+                "y": 522.8963171063244,
+                "index": 0
+            },
+            {
+                "name": "Heo",
+                "cost": 20,
+                "x": 698.6095715810438,
+                "y": 448.4711939151893,
+                "index": 0
+            },
+            {
+                "name": "Heo",
+                "cost": 20,
+                "x": 1087.0024628868634,
+                "y": 379.89975371131106,
+                "index": 0
+            },
+            {
+                "name": "Heo",
+                "cost": 20,
+                "x": 480.3222794386571,
+                "y": 378.2189880078379,
+                "index": 0
+            },
+            {
+                "name": "G\u00e0",
+                "cost": 15,
+                "x": 470.533446179516,
+                "y": 471.2136229057928,
                 "index": 0
             }
         ],
         "toolbar": [
+            {
+                "item": null,
+                "quantity": 0
+            },
             {
                 "item": {
                     "name": "Carbage",
@@ -698,41 +798,11 @@
                     "gravity": 0.5,
                     "offset_y": 0
                 },
-                "quantity": 869
+                "quantity": 4
             },
             {
-                "item": {
-                    "name": "Corn",
-                    "index": 7,
-                    "base_x": 0,
-                    "base_y": 0,
-                    "angle": 0,
-                    "angle_direction": 1,
-                    "float_offset": 0,
-                    "float_timer": 0,
-                    "bouncing": true,
-                    "bounce_velocity": -5,
-                    "gravity": 0.5,
-                    "offset_y": 0
-                },
-                "quantity": 2
-            },
-            {
-                "item": {
-                    "name": "Rice",
-                    "index": 3,
-                    "base_x": 650,
-                    "base_y": 168,
-                    "angle": -2.5,
-                    "angle_direction": 1,
-                    "float_offset": 2.6472973286019825,
-                    "float_timer": 15.15000000000008,
-                    "bouncing": false,
-                    "bounce_velocity": 5.5,
-                    "gravity": 0.5,
-                    "offset_y": 0
-                },
-                "quantity": 544
+                "item": null,
+                "quantity": 0
             },
             {
                 "item": null,
@@ -766,62 +836,75 @@
         "inventory": [
             {
                 "item": {
-                    "name": "Carbage",
-                    "index": 28,
-                    "base_x": 648,
-                    "base_y": 175,
-                    "angle": -4.0,
-                    "angle_direction": 1,
-                    "float_offset": 4.630750103403179,
-                    "float_timer": 32.600000000000286,
-                    "bouncing": false,
-                    "bounce_velocity": 5.5,
-                    "gravity": 0.5,
-                    "offset_y": 0
-                },
-                "quantity": 448
-            },
-            {
-                "item": {
                     "name": "Rice",
                     "index": 3,
-                    "base_x": 327,
-                    "base_y": 180,
-                    "angle": 2.5,
-                    "angle_direction": -1,
-                    "float_offset": -4.614732255049155,
-                    "float_timer": 29.450000000000284,
-                    "bouncing": false,
-                    "bounce_velocity": 5.5,
+                    "base_x": 0,
+                    "base_y": 0,
+                    "angle": 0,
+                    "angle_direction": 1,
+                    "float_offset": 0,
+                    "float_timer": 0,
+                    "bouncing": true,
+                    "bounce_velocity": -5,
                     "gravity": 0.5,
                     "offset_y": 0
                 },
-                "quantity": 288
+                "quantity": 2
+            },
+            {
+                "item": null,
+                "quantity": 0
             },
             {
                 "item": {
                     "name": "Corn",
                     "index": 7,
-                    "base_x": 1137,
-                    "base_y": 497,
-                    "angle": -4.0,
+                    "base_x": 0,
+                    "base_y": 0,
+                    "angle": 0,
                     "angle_direction": 1,
-                    "float_offset": 4.272994540441443,
-                    "float_timer": 8.399999999999984,
-                    "bouncing": false,
-                    "bounce_velocity": 5.5,
+                    "float_offset": 0,
+                    "float_timer": 0,
+                    "bouncing": true,
+                    "bounce_velocity": -5,
                     "gravity": 0.5,
                     "offset_y": 0
                 },
-                "quantity": 64
+                "quantity": 3
             },
             {
-                "item": null,
-                "quantity": 0
+                "item": {
+                    "name": "Carrot",
+                    "index": 2,
+                    "base_x": 0,
+                    "base_y": 0,
+                    "angle": 0,
+                    "angle_direction": 1,
+                    "float_offset": 0,
+                    "float_timer": 0,
+                    "bouncing": true,
+                    "bounce_velocity": -5,
+                    "gravity": 0.5,
+                    "offset_y": 0
+                },
+                "quantity": 2
             },
             {
-                "item": null,
-                "quantity": 0
+                "item": {
+                    "name": "Straw_berry",
+                    "index": 4,
+                    "base_x": 0,
+                    "base_y": 0,
+                    "angle": 0,
+                    "angle_direction": 1,
+                    "float_offset": 0,
+                    "float_timer": 0,
+                    "bouncing": true,
+                    "bounce_velocity": -5,
+                    "gravity": 0.5,
+                    "offset_y": 0
+                },
+                "quantity": 2
             },
             {
                 "item": null,

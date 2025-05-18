@@ -10,6 +10,7 @@ from audio import start_background_music, stop_music
 from login import login_screen
 from player import Player
 from settings_manager import Settings, settings_screen
+pygame.mixer.init()
 
 pygame.init()
 WIDTH, HEIGHT = 1915, 1020
@@ -84,7 +85,7 @@ def main():
     clock = pygame.time.Clock()
     last_save_time = pygame.time.get_ticks()
     SAVE_INTERVAL = 60000
-
+    start_background_music()
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
