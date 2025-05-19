@@ -43,6 +43,7 @@ shelf_positions = [
     (946, 534,1245, 686),# Shelf 4
 
 ]
+merchant = None
 last_merchant_spawn = 0
 
 def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,player):
@@ -55,7 +56,6 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,player):
     show_feed_ui = False
     clock = pygame.time.Clock()
     count_select_one_day = 3
-    merchant = Merchant()
     show_merchant = False
     buy_merchant = True
     first_time = True
@@ -71,6 +71,7 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,player):
     selection_rect = None
     merchant_buttons = []  # Reset mỗi frame
     selected_toolbar_index = 0
+    global merchant, last_merchant_spawn
     tilemap = TileMap("assets/tiles/background.tmx")
     sell_sound = pygame.mixer.Sound("assets/audios/sell.mp3")
     truck_sound = pygame.mixer.Sound("assets/audios/truck.mp3")
@@ -115,18 +116,16 @@ def gameplay_screen(SCREEN, WIDTH, HEIGHT, FONT, BIG_FONT, COLORS,clock,player):
         SCREEN.fill(COLORS["GREEN"])
         tilemap.draw(SCREEN)
 
-        merchant_buttons.clear()
-        if (current_day % 2 == 0) and buy_merchant:
-            merchant = Merchant()
-            show_merchant = True
-            buy_merchant = False
-        global last_merchant_spawn
+        # Thời gian hiện tại
         now = pygame.time.get_ticks()
-        if now - last_merchant_spawn >= 600000:  # 5 phút = 300,000 ms
+
+        # Nếu chưa có merchant hoặc đã quá 10 phút → tạo mới
+        if merchant is None or now - last_merchant_spawn >= 600000:
             merchant = Merchant()
             truck_sound.play()
             last_merchant_spawn = now
             show_merchant = True
+
 
 
         # Animal drawing
